@@ -62,7 +62,7 @@ CREATE TABLE Customers(
 );
 
 CREATE TABLE Employees(
-    username    VARCHAR2(20) UNIQUE,
+    username    VARCHAR2(20) UNIQUE NOT NULL,
     password    VARCHAR2(60) NOT NULL
 );
 
@@ -331,6 +331,17 @@ INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerI
 VALUES (1, 2, 'Worse car I have driven!', 21, 7, 13);
 INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
 VALUES (4, NULL, NULL, 22, 15, 12);
+
+INSERT INTO Employees (username, password) VALUES ('john_doe', 'password123');
+INSERT INTO Employees (username, password) VALUES ('jane_smith', 'securepass');
+INSERT INTO Employees (username, password) VALUES ('mark_jones', 'employee123');
+INSERT INTO Employees (username, password) VALUES ('sara_williams', 'pass456');
+INSERT INTO Employees (username, password) VALUES ('robert_adams', '1234abcd');
+INSERT INTO Employees (username, password) VALUES ('emily_white', 'p@ssw0rd');
+INSERT INTO Employees (username, password) VALUES ('david_miller', 'employeepass');
+INSERT INTO Employees (username, password) VALUES ('lisa_jackson', 'qwerty123');
+INSERT INTO Employees (username, password) VALUES ('michael_clark', 'letmein');
+INSERT INTO Employees (username, password) VALUES ('amber_lee', 'employee789');
 
 
 /**BIANCA**/
