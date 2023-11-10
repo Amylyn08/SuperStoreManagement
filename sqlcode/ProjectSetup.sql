@@ -1,7 +1,6 @@
 --Amy Nguyen,Bianca Rossetti
 
 DROP TABLE Employees;
-DROP TABLE Review_Customers;
 DROP TABLE Orders_Products ;
 DROP TABLE Stores_Products;
 DROP TABLE Warehouses_Products;
@@ -346,6 +345,7 @@ INSERT INTO Employees (username, password) VALUES ('amber_lee', 'employee789');
 
 /**BIANCA**/
 
+/* this function taks a productid as input and will calculate the total inventory for that product across all tables */
 
 
 /****/
