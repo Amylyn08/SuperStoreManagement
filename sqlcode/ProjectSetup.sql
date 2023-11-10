@@ -346,6 +346,73 @@ INSERT INTO Employees (username, password) VALUES ('amber_lee', 'employee789');
 /**BIANCA**/
 
 /* this function taks a productid as input and will calculate the total inventory for that product across all tables */
+CREATE OR REPLACE FUNCTION totalInventory(productIDsearch Products.productID%TYPE)
+RETURN NUMBER
+AS
+    totalnum NUMBER(10);
+BEGIN
+    SELECT
+        SUM(quantity) INTO totalNum
+    FROM
+        Warehouses_Products
+    WHERE
+        productId = productIDsearch;
+    RETURN(totalNum);
+END;
+/
+
+DROP FUNCTION flaggedCustomers;
+
+CREATE OR REPLACE PACKAGE calculations AS
+    TYPE cus_names IS TABLE OF VARCHAR(100)
+    INDEX BY PLS_INTEGER;
+    FUNCTION flaggedCustomers RETURN cus_names;
+END calculations;
+/
+
+CREATE OR REPLACE PACKAGE BODY calculations AS
+    FUNCTION flaggedCustomers
+    RETURN cus_names
+    AS 
+        customers cus_names;
+    BEGIN
+        SELECT
+            firstName || ' ' || lastName BULK COLLECT INTO customers
+        FROM
+            Customers INNER JOIN Reviews
+            USING(customerID)
+        WHERE
+            flagNums IS NOT NULL AND
+            flagNums > 0;
+        RETURN(customers);
+    END;
+END calculations;
+
+/
+DECLARE
+    customers calculations.cus_names;
+    id PLS_INTEGER;
+BEGIN
+    customers := calculations.flaggedCustomers();
+    FOR id IN 0 .. customers.count LOOP
+        dbms_output.put_line(customers(id));
+    END LOOP;
+END;
+/
+SELECT
+            firstName || ' ' || lastName AS "cus"
+        FROM
+            Customers INNER JOIN Reviews
+            USING(customerID)
+        WHERE
+            flagNums IS NOT NULL AND
+            flagNums > 0;
+
+
+
+
+
+
 
 
 /****/
