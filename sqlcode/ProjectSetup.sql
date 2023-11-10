@@ -281,6 +281,7 @@ INSERT INTO Orders_Products (orderID, productID, quantity) VALUES (20, 15, 3);
 INSERT INTO Orders_Products (orderID, productID, quantity) VALUES (21, 14, 1);
 INSERT INTO Orders_Products (orderID, productID, quantity) VALUES (22, 7, 1);
 INSERT INTO Orders_Products (orderID, productID, quantity) VALUES (23, 15, 3);
+
 INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
 VALUES (4, 0, 'It was affordable.', 1, 1, 1);
 INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
