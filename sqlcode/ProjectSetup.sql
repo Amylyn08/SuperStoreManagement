@@ -333,12 +333,15 @@ INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerI
 VALUES (4, NULL, NULL, 22, 15, 12);
 
 
-/*
-procedures:
-
-triggers:
-
-log tables:
+/**BIANCA**/
 
 
-*/
+
+/****/
+
+/**AMY**/
+
+
+
+
+/****/
