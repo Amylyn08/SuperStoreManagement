@@ -361,30 +361,31 @@ BEGIN
 END;
 /
 
-DROP FUNCTION flaggedCustomers;
-
 CREATE OR REPLACE PACKAGE calculations AS
-    TYPE cus_names IS TABLE OF VARCHAR(100)
-    INDEX BY PLS_INTEGER;
     FUNCTION flaggedCustomers RETURN cus_names;
 END calculations;
 /
 
 CREATE OR REPLACE PACKAGE BODY calculations AS
+    TYPE cus_names IS TABLE OF VARCHAR(100)
+    INDEX BY PLS_INTEGER;
+    
     FUNCTION flaggedCustomers
     RETURN cus_names
     AS 
-        customers cus_names;
+        custs cus_names;
     BEGIN
+        DBMS_OUTPUT.PUT_LINE('Before SELECT');
         SELECT
-            firstName || ' ' || lastName BULK COLLECT INTO customers
+            firstName || ' ' || lastName BULK COLLECT INTO custs
         FROM
             Customers INNER JOIN Reviews
             USING(customerID)
         WHERE
             flagNums IS NOT NULL AND
             flagNums > 0;
-        RETURN(customers);
+        RETURN(custs);
+        
     END;
 END calculations;
 
@@ -394,20 +395,11 @@ DECLARE
     id PLS_INTEGER;
 BEGIN
     customers := calculations.flaggedCustomers();
-    FOR id IN 0 .. customers.count LOOP
+    FOR id IN 1 .. customers.count LOOP
         dbms_output.put_line(customers(id));
     END LOOP;
 END;
 /
-SELECT
-            firstName || ' ' || lastName AS "cus"
-        FROM
-            Customers INNER JOIN Reviews
-            USING(customerID)
-        WHERE
-            flagNums IS NOT NULL AND
-            flagNums > 0;
-
 
 
 
