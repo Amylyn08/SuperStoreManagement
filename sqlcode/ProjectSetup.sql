@@ -362,20 +362,19 @@ END;
 /
 
 CREATE OR REPLACE PACKAGE calculations AS
+    TYPE cus_names IS TABLE OF VARCHAR(100)
+    INDEX BY PLS_INTEGER;
     FUNCTION flaggedCustomers RETURN cus_names;
 END calculations;
 /
 
 CREATE OR REPLACE PACKAGE BODY calculations AS
-    TYPE cus_names IS TABLE OF VARCHAR(100)
-    INDEX BY PLS_INTEGER;
-    
+    /** this function returns an array which represents the customers who have flagged reviews **/
     FUNCTION flaggedCustomers
     RETURN cus_names
     AS 
         custs cus_names;
     BEGIN
-        DBMS_OUTPUT.PUT_LINE('Before SELECT');
         SELECT
             firstName || ' ' || lastName BULK COLLECT INTO custs
         FROM
@@ -385,11 +384,17 @@ CREATE OR REPLACE PACKAGE BODY calculations AS
             flagNums IS NOT NULL AND
             flagNums > 0;
         RETURN(custs);
-        
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            dbms_output.put_line('no data was found');
+            RAISE;
+        WHEN OTHERS THEN
+            dbms_output.put_line('error!');
+            RAISE;
     END;
 END calculations;
-
 /
+
 DECLARE
     customers calculations.cus_names;
     id PLS_INTEGER;
@@ -400,12 +405,6 @@ BEGIN
     END LOOP;
 END;
 /
-
-
-
-
-
-
 
 /****/
 
