@@ -350,15 +350,19 @@ INSERT INTO Employees (username, password) VALUES ('amber_lee', 'employee789');
 
 /****/
 
+
 /**AMY**/
+/
 CREATE OR REPLACE FUNCTION getValidLogins(Fusername Employees.username%TYPE, Fpassword Employees.password%TYPE) RETURN NUMBER
     IS
         TYPE employees IS TABLE OF VARCHAR2(40)
         INDEX BY PLS_INTEGER;
         
+        e_invalidLogin EXCEPTION;
+        
         numUserMatches employees;
     BEGIN
-        SELECT * BULK COLLECT INTO numUserMatches
+        SELECT username BULK COLLECT INTO numUserMatches
             FROM Employees
             WHERE Fusername = username AND Fpassword = password;
             
@@ -381,20 +385,15 @@ CREATE OR REPLACE FUNCTION getValidLogins(Fusername Employees.username%TYPE, Fpa
 /
 
 DECLARE 
-        TYPE employees IS TABLE OF VARCHAR2(40)
-        INDEX BY PLS_INTEGER;
-        
-        numUserMatches employees;
+    userName Employees.username%TYPE := 'john_doe';
+    password Employees.password%TYPE := 'password123';
+    
+    result NUMBER(2);
 BEGIN
-    SELECT 
-        * BULK COLLECT INTO numUserMatches
-    FROM 
-        Employees
-    WHERE 
-        username = 'john_doe' AND
-        password = 'p@ssw0rd';
-        
-    dbms_output.put_line(numUserMatches.COUNT);
+    result := getValidLogins(userName, password);
+    dbms_output.put_line(result);
+EXCEPTION 
+    WHEN OTHERS THEN 
+        dbms_output.put_line('something went wrong');
 END;
-
 /****/
