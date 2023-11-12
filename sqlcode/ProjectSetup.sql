@@ -384,13 +384,27 @@ CREATE OR REPLACE FUNCTION getValidLogins(Fusername Employees.username%TYPE, Fpa
     END;
 /
 
-DECLARE 
-    userName Employees.username%TYPE := 'john_doe';
-    password Employees.password%TYPE := 'password123';
+CREATE OR REPLACE FUNCTION numOrders(fproductID Products.productid%TYPE) RETURN NUMBER 
+    AS
+        results NUMBER(3);
+    BEGIN 
+        SELECT COUNT(orderid) INTO results 
+            FROM Orders_products
+            WHERE productid = fproductID;
     
-    result NUMBER(2);
+        RETURN results;
+    EXCEPTION
+        WHEN OTHERS THEN
+            dbms_output.put_line('something went wrong');
+            RAISE;
+    END;
+/
+
+DECLARE 
+    productid orders_products.productid%TYPE := 6;
+    result NUMBER(3);
 BEGIN
-    result := getValidLogins(userName, password);
+    result := numOrders(productid);
     dbms_output.put_line(result);
 EXCEPTION 
     WHEN OTHERS THEN 
