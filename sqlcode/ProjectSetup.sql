@@ -400,8 +400,25 @@ CREATE OR REPLACE FUNCTION numOrders(fproductID Products.productid%TYPE) RETURN 
     END;
 /
 
+CREATE OR REPLACE FUNCTION calculateAvgReviewScore(fproductID Reviews.productid%TYPE) RETURN NUMBER
+    AS
+        averageScore NUMBER(2,1);
+    BEGIN
+        SELECT AVG(reviewid) INTO averageScore 
+            FROM Reviews 
+            WHERE productid = fproductID;
+        
+        RETURN averageScore;
+    
+    EXCEPTION 
+        WHEN OTHERS THEN 
+            dbms_output.put_line('something went wrong' || SQLERRM);
+    END;
+
+/
+
 DECLARE 
-    productid orders_products.productid%TYPE := 6;
+    productid orders_products.productid%TYPE := 15;
     result NUMBER(3);
 BEGIN
     result := numOrders(productid);
