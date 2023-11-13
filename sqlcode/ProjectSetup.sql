@@ -138,7 +138,7 @@ INSERT INTO Products (name, category, productID) VALUES ('Truck 500c', 'Vehicle'
 INSERT INTO Products (name, category, productID) VALUES ('paper towel', 'Beauty', 10);
 INSERT INTO Products (name, category, productID) VALUES ('plum', 'grocery', 11);
 INSERT INTO Products (name, category, productID) VALUES ('Lamborghini Lego', 'Toys', 12);
-INSERT INTO Products (name, category, productID) VALUES ('chicken', 'grocery', 13);
+INSERT INTO Products (name, category, productID) VALUES ('chicken', 'Grocery', 13);
 INSERT INTO Products (name, category, productID) VALUES ('PS5', 'electronics', 14);
 INSERT INTO Products (name, category, productID) VALUES ('pasta', 'Grocery', 15);
 INSERT INTO Products (name, category, productID) VALUES ('tomato', 'Grocery', 16);
@@ -402,9 +402,9 @@ CREATE OR REPLACE FUNCTION numOrders(fproductID Products.productid%TYPE) RETURN 
 
 CREATE OR REPLACE FUNCTION calculateAvgReviewScore(fproductID Reviews.productid%TYPE) RETURN NUMBER
     AS
-        averageScore NUMBER(2,1);
+        averageScore NUMBER(4,2);
     BEGIN
-        SELECT AVG(reviewid) INTO averageScore 
+        SELECT AVG(star) INTO averageScore 
             FROM Reviews 
             WHERE productid = fproductID;
         
@@ -417,14 +417,23 @@ CREATE OR REPLACE FUNCTION calculateAvgReviewScore(fproductID Reviews.productid%
 
 /
 
-DECLARE 
-    productid orders_products.productid%TYPE := 15;
-    result NUMBER(3);
-BEGIN
-    result := numOrders(productid);
-    dbms_output.put_line(result);
-EXCEPTION 
-    WHEN OTHERS THEN 
-        dbms_output.put_line('something went wrong');
-END;
+CREATE OR REPLACE PROCEDURE flagReview(pReviewID Reviews.reviewid%TYPE) 
+    AS
+    
+    BEGIN
+        
+    
+    END;
+
+--DECLARE 
+--    productid orders_products.productid%TYPE := 15;
+--    result NUMBER(3);
+--BEGIN
+--    result := calculateAvgReviewScore(productid);
+--    dbms_output.put_line(result);
+--EXCEPTION 
+--    WHEN OTHERS THEN 
+--        dbms_output.put_line('something went wrong');
+--END;
+
 /****/
