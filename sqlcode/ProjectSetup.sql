@@ -303,17 +303,17 @@ VALUES (1, 0, 'Missing some parts', 7, 7, 1);
 INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
 VALUES (5, 1, 'Trash', 8, 8, 6);
 INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (2, NULL, NULL, 9, 9, 7);
+VALUES (2, 0, NULL, 9, 9, 7);
 INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (5, NULL, NULL, 10, 10, 8);
+VALUES (5, 0, NULL, 10, 10, 8);
 INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (4, NULL, NULL, 11, 11, 9);
+VALUES (4, 0, NULL, 11, 11, 9);
 INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (3, NULL, NULL, 12, 6, 3);
+VALUES (3, 0, NULL, 12, 6, 3);
 INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
 VALUES (1, 0, 'Missing some parts', 13, 12, 1);
 INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (4, NULL, NULL, 14, 11, 1);
+VALUES (4, 0, NULL, 14, 11, 1);
 INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
 VALUES (1, 0, 'Great product', 15, 12, 14);
 INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
@@ -323,13 +323,13 @@ VALUES (1, 0, NULL, 17, 3, 2);
 INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
 VALUES (4, 0, NULL, 18, 5, 2);
 INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (4, NULL, NULL, 19, 13, 11);
+VALUES (4, 0, NULL, 19, 13, 11);
 INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (5, NULL, NULL, 20, 15, 12);
+VALUES (5, 0, NULL, 20, 15, 12);
 INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
 VALUES (1, 2, 'Worse car I have driven!', 21, 7, 13);
 INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (4, NULL, NULL, 22, 15, 12);
+VALUES (4, 0, NULL, 22, 15, 12);
 
 INSERT INTO Employees (username, password) VALUES ('john_doe', 'password123');
 INSERT INTO Employees (username, password) VALUES ('jane_smith', 'securepass');
@@ -342,7 +342,7 @@ INSERT INTO Employees (username, password) VALUES ('lisa_jackson', 'qwerty123');
 INSERT INTO Employees (username, password) VALUES ('michael_clark', 'letmein');
 INSERT INTO Employees (username, password) VALUES ('amber_lee', 'employee789');
 
-
+/
 /**BIANCA**/
 
 /* this function taks a productid as input and will calculate the total inventory for that product across all tables */
@@ -352,38 +352,10 @@ INSERT INTO Employees (username, password) VALUES ('amber_lee', 'employee789');
 
 
 /**AMY**/
-/
-CREATE OR REPLACE FUNCTION getValidLogins(Fusername Employees.username%TYPE, Fpassword Employees.password%TYPE) RETURN NUMBER
-    IS
-        TYPE employees IS TABLE OF VARCHAR2(40)
-        INDEX BY PLS_INTEGER;
-        
-        e_invalidLogin EXCEPTION;
-        
-        numUserMatches employees;
-    BEGIN
-        SELECT username BULK COLLECT INTO numUserMatches
-            FROM Employees
-            WHERE Fusername = username AND Fpassword = password;
-            
-        IF numUserMatches.COUNT = 0 THEN
-            RAISE e_invalidLogin;
-        
-        END IF;
-        RETURN numUserMatches.COUNT;
-        
-    EXCEPTION
-        WHEN e_invalidLogin THEN
-            dbms_output.put_line(SQLERRM);
-            dbms_output.put_line('Username or password is incorrect.');
-            RAISE;
-        WHEN OTHERS THEN 
-            dbms_output.put_line(SQLERRM);
-            dbms_output.put_line('something went wrong, see block above');
-            RAISE;
-    END;
-/
 
+/**
+*
+*/
 CREATE OR REPLACE FUNCTION numOrders(fproductID Products.productid%TYPE) RETURN NUMBER 
     AS
         results NUMBER(3);
@@ -399,7 +371,10 @@ CREATE OR REPLACE FUNCTION numOrders(fproductID Products.productid%TYPE) RETURN 
             RAISE;
     END;
 /
-
+/**
+*This function calculates the average score of a product.
+*returns the average
+*/
 CREATE OR REPLACE FUNCTION calculateAvgReviewScore(fproductID Reviews.productid%TYPE) RETURN NUMBER
     AS
         averageScore NUMBER(4,2);
@@ -416,24 +391,58 @@ CREATE OR REPLACE FUNCTION calculateAvgReviewScore(fproductID Reviews.productid%
     END;
 
 /
-
+/**
+*Takes the reviewID, adds  1  to the current flagNums 
+*Valdation: if flagNum >=2, delete row with that reviewID
+*
+**/
 CREATE OR REPLACE PROCEDURE flagReview(pReviewID Reviews.reviewid%TYPE) 
+    AS
+        oldFlagNum NUMBER(2) := 0;
+    BEGIN
+        SELECT flagnums INTO oldFlagNum
+        FROM Reviews
+        WHERE reviewid = pReviewID;
+        
+        oldFlagNum := oldFlagNum + 1;
+        
+        IF (oldFlagNum >= 2) THEN
+            DELETE FROM Reviews WHERE reviewid = pReviewID;
+        ELSE
+            UPDATE Reviews SET flagnums = oldFlagNum
+            WHERE reviewid = pReviewID;
+        END IF;
+        
+    EXCEPTION 
+        WHEN OTHERS THEN 
+            dbms_output.put_line('something went wrong' || SQLERRM);
+        RAISE;
+        
+    END;
+/
+/**proceudre createReview(reviewObj) --> 
+ INSERT INTO REVIEWS (VALUES) (reviewobj.customerId)**/
+ 
+/**
+*This procedure deletes a warehouse when taken in a warehouseid 
+*/
+CREATE OR REPLACE PROCEDURE removeWarehouse(pWarehouseID Warehouses.warehouseid%TYPE)
     AS
     
     BEGIN
-        
-    
+        DELETE FROM Warehouses WHERE warehouseid = pWarehouseID;
+    EXCEPTION
+        WHEN OTHERS THEN
+            dbms_output.put_line('something went wrong' || SQLEERM);
     END;
 
---DECLARE 
---    productid orders_products.productid%TYPE := 15;
---    result NUMBER(3);
---BEGIN
---    result := calculateAvgReviewScore(productid);
---    dbms_output.put_line(result);
---EXCEPTION 
---    WHEN OTHERS THEN 
---        dbms_output.put_line('something went wrong');
---END;
-
+DECLARE 
+    reviewID orders_products.productid%TYPE := 22;
+BEGIN
+    flagReview(reviewID);
+EXCEPTION 
+    WHEN OTHERS THEN 
+        dbms_output.put_line('something went wrong');
+END;
+/
 /****/
