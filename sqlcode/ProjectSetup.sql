@@ -364,8 +364,6 @@ BEGIN
 END;
 /
 
-DROP FUNCTION flaggedCustomers;
-
 CREATE OR REPLACE PACKAGE calculations AS
     TYPE cus_names IS TABLE OF VARCHAR(100)
     INDEX BY PLS_INTEGER;
@@ -393,13 +391,15 @@ END calculations;
 /
 /* createOrder (orderID OUT, storeID, cusID): function that takes as input storeID and customerID */
 
-/* addOrderItem(orderID -> from CreateOrder, prodID, quantity ): in jdbc, use a loop to call addOrderItem for every product they add to their order */
+/* addOrderItem(orderID -> from CreateOrder, prodID, quantity ): in jdbc, use a loop to call addOrderItem for every product they add to their order 
+this procedure will add a new order item into the database */
 CREATE OR REPLACE PROCEDURE addOrderItem(
     newOrderID IN Orders_Products.orderID%TYPE,
     newProductID IN Orders_Products.productID%TYPE,
     newQuantity IN Orders_Products.quantity%TYPE)
 AS
 BEGIN
+    
     INSERT INTO Orders_Products
     VALUES(newOrderID, newProductID, newQuantity);
 EXCEPTION
@@ -408,8 +408,8 @@ EXCEPTION
         RAISE;
 END;
 /
-/* removeProductID(productID) */
 
+/* this procedure takes an old productID and will remove it from the database */
 CREATE OR REPLACE PROCEDURE removeProduct(oldProductID IN Products.productID%TYPE)
 AS
 BEGIN
@@ -417,6 +417,7 @@ BEGIN
 END;
 /
 
+/* this trigger logs any orders that have been added into the LogOrderModification table */
 CREATE TRIGGER  After_OrderModification_Insert
 AFTER INSERT
 ON Orders
@@ -427,6 +428,7 @@ BEGIN
 END;
 /
 
+/* this trigger logs any reviews that have been added or deleted into the LogReviewModification table */
 CREATE OR REPLACE TRIGGER  Before_ReviewDelete_Delete
 BEFORE DELETE OR INSERT
 ON Reviews
@@ -442,10 +444,6 @@ BEGIN
 END;
 /
 
-DECLARE
-BEGIN
-    removeProduct(1);
-END;
 
 /****/
 
