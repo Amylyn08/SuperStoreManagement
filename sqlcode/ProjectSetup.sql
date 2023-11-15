@@ -345,6 +345,35 @@ INSERT INTO Employees (username, password) VALUES ('amber_lee', 'employee789');
 
 /**BIANCA**/
 
+CREATE OR REPLACE TYPE product_type AS OBJECT(
+    productID NUMBER(2),
+    quantity NUMBER(8)
+);
+/
+CREATE OR REPLACE TYPE ProductIDList AS TABLE OF product_type;
+/
+
+CREATE OR REPLACE TYPE order_type AS OBJECT(
+    customerID      NUMBER(2),
+    storeID         NUMBER(2),
+    productIDs      ProductIDList
+);
+/
+
+CREATE OR REPLACE PROCEDURE createOrder(orderObject IN order_type, newOrderID OUT Orders.orderID%TYPE )
+AS
+BEGIN
+    INSERT INTO Orders (orderID, customerID, storeID, orderDate)
+    VALUES(24, orderObject.customerID, orderObject.storeID, CURRENT_DATE);
+    --RETURNING orderID INTO newOrderID;
+    
+    FOR i IN 1 .. orderObject.productIDs.COUNT LOOP
+        INSERT INTO Orders_Products
+        VALUES(24, orderObject.productIDs(i).productID, orderObject.productIDs(i).quantity);
+    END LOOP;
+END;
+/
+
 /* this function taks a productid as input and will calculate the total inventory for that product across all tables */
 CREATE OR REPLACE FUNCTION totalInventory(productIDsearch Products.productID%TYPE)
 RETURN NUMBER
