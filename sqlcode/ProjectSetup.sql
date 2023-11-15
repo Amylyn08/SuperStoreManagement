@@ -102,61 +102,61 @@ CREATE TABLE LogReviewModification(
 );
 
 /** inserts **/
-INSERT INTO Stores (storeID, name) 
-VALUES (1, 'marche adonis');
-INSERT INTO Stores (storeID, name) 
-VALUES (2, 'marche atwater');
-INSERT INTO Stores (storeID, name) 
-VALUES (3, 'dawson store');
-INSERT INTO Stores (storeID, name) 
-VALUES (4, 'store magic');
-INSERT INTO Stores (storeID, name) 
-VALUES (5, 'movie store');
-INSERT INTO Stores (storeID, name) 
-VALUES (6, 'super rue champlain');
-INSERT INTO Stores (storeID, name) 
-VALUES (7, 'toy r us');
-INSERT INTO Stores (storeID, name) 
-VALUES (8, 'Dealer one');
-INSERT INTO Stores (storeID, name) 
-VALUES (9, 'dealer montreal');
-INSERT INTO Stores (storeID, name) 
-VALUES (10, 'movie start');
-INSERT INTO Stores (storeID, name) 
-VALUES (11, 'star store');
+INSERT INTO Stores (name) 
+VALUES ('marche adonis');
+INSERT INTO Stores (name) 
+VALUES ('marche atwater');
+INSERT INTO Stores (name) 
+VALUES ('dawson store');
+INSERT INTO Stores (name) 
+VALUES ('store magic');
+INSERT INTO Stores (name) 
+VALUES ('movie store');
+INSERT INTO Stores (name) 
+VALUES ('super rue champlain');
+INSERT INTO Stores (name) 
+VALUES ('toy r us');
+INSERT INTO Stores (name) 
+VALUES ('Dealer one');
+INSERT INTO Stores (name) 
+VALUES ('dealer montreal');
+INSERT INTO Stores (name) 
+VALUES ('movie start');
+INSERT INTO Stores (name) 
+VALUES ('star store');
 
-INSERT INTO Warehouses (warehouseID, name, streetAddress, city, province, country) 
-VALUES (1, 'Warehouse A', '100 rue William', 'Saint Laurent', 'Quebec', 'Canada');
-INSERT INTO Warehouses (warehouseID, name, streetAddress, city, province, country) 
-VALUES (2, 'Warehouse B', '304 Rue Francois-Perrault', 'Villeray Saint-Michel', 'Quebec', 'Canada');
-INSERT INTO Warehouses (warehouseID, name, streetAddress, city, province, country) 
-VALUES (3, 'Warehouse C', '86700 Weston Rd', 'Toronto', 'Ontario', 'Canada');
-INSERT INTO Warehouses (warehouseID, name, streetAddress, city, province, country) 
-VALUES (4, 'Warehouse D', '170 Sideroad', 'Quebec City', 'Quebec', 'Canada');
-INSERT INTO Warehouses (warehouseID, name, streetAddress, city, province, country) 
-VALUES (5, 'Warehouse E', '1231 Trudea road', 'Ottawa', 'Ontario', 'Canada');
-INSERT INTO Warehouses (warehouseID, name, streetAddress, city, province, country) 
-VALUES (6, 'Warehouse F', '16 Whitlock Rd', NULL, 'Alberta', 'Canada');
+INSERT INTO Warehouses (name, streetAddress, city, province, country) 
+VALUES ('Warehouse A', '100 rue William', 'Saint Laurent', 'Quebec', 'Canada');
+INSERT INTO Warehouses (name, streetAddress, city, province, country) 
+VALUES ('Warehouse B', '304 Rue Francois-Perrault', 'Villeray Saint-Michel', 'Quebec', 'Canada');
+INSERT INTO Warehouses (name, streetAddress, city, province, country) 
+VALUES ('Warehouse C', '86700 Weston Rd', 'Toronto', 'Ontario', 'Canada');
+INSERT INTO Warehouses (name, streetAddress, city, province, country) 
+VALUES ('Warehouse D', '170 Sideroad', 'Quebec City', 'Quebec', 'Canada');
+INSERT INTO Warehouses (name, streetAddress, city, province, country) 
+VALUES ('Warehouse E', '1231 Trudea road', 'Ottawa', 'Ontario', 'Canada');
+INSERT INTO Warehouses (name, streetAddress, city, province, country) 
+VALUES ('Warehouse F', '16 Whitlock Rd', NULL, 'Alberta', 'Canada');
 
 /*warehouses_stores???*/
 
-INSERT INTO Products (name, category, productID) VALUES ('laptop ASUS 104S', 'electronics', 1);
-INSERT INTO Products (name, category, productID) VALUES ('apple', 'Grocery', 2);
-INSERT INTO Products (name, category, productID) VALUES ('SIMS CD', 'Video Games', 3);
-INSERT INTO Products (name, category, productID) VALUES ('orange', 'grocery', 4);
-INSERT INTO Products (name, category, productID) VALUES ('Barbie Movie', 'DVD', 5);
-INSERT INTO Products (name, category, productID) VALUES ('L''Oreal Normal Hair', 'Health', 6);
-INSERT INTO Products (name, category, productID) VALUES ('BMW iX Lego', 'Toys', 7);
-INSERT INTO Products (name, category, productID) VALUES ('BMW i6', 'Cars', 8);
-INSERT INTO Products (name, category, productID) VALUES ('Truck 500c', 'Vehicle', 9);
-INSERT INTO Products (name, category, productID) VALUES ('paper towel', 'Beauty', 10);
-INSERT INTO Products (name, category, productID) VALUES ('plum', 'grocery', 11);
-INSERT INTO Products (name, category, productID) VALUES ('Lamborghini Lego', 'Toys', 12);
-INSERT INTO Products (name, category, productID) VALUES ('chicken', 'grocery', 13);
-INSERT INTO Products (name, category, productID) VALUES ('PS5', 'electronics', 14);
-INSERT INTO Products (name, category, productID) VALUES ('pasta', 'Grocery', 15);
-INSERT INTO Products (name, category, productID) VALUES ('tomato', 'Grocery', 16);
-INSERT INTO Products (name, category, productID) VALUES ('Train X745', 'Vehicle', 17);
+INSERT INTO Products (name, category) VALUES ('laptop ASUS 104S', 'electronics');
+INSERT INTO Products (name, category) VALUES ('apple', 'Grocery');
+INSERT INTO Products (name, category) VALUES ('SIMS CD', 'Video Games');
+INSERT INTO Products (name, category) VALUES ('orange', 'grocery');
+INSERT INTO Products (name, category) VALUES ('Barbie Movie', 'DVD');
+INSERT INTO Products (name, category) VALUES ('L''Oreal Normal Hair', 'Health');
+INSERT INTO Products (name, category) VALUES ('BMW iX Lego', 'Toys');
+INSERT INTO Products (name, category) VALUES ('BMW i6', 'Cars');
+INSERT INTO Products (name, category) VALUES ('Truck 500c', 'Vehicle');
+INSERT INTO Products (name, category) VALUES ('paper towel', 'Beauty');
+INSERT INTO Products (name, category) VALUES ('plum', 'grocery');
+INSERT INTO Products (name, category) VALUES ('Lamborghini Lego', 'Toys');
+INSERT INTO Products (name, category) VALUES ('chicken', 'grocery');
+INSERT INTO Products (name, category) VALUES ('PS5', 'electronics');
+INSERT INTO Products (name, category) VALUES ('pasta', 'Grocery');
+INSERT INTO Products (name, category) VALUES ('tomato', 'Grocery');
+INSERT INTO Products (name, category) VALUES ('Train X745', 'Vehicle');
 
 INSERT INTO Warehouses_Products (warehouseID, productID, quantity) VALUES (1, 1, 1000);
 INSERT INTO Warehouses_Products (warehouseID, productID, quantity) VALUES (2, 2, 24980);
@@ -200,81 +200,81 @@ INSERT INTO Stores_Products (storeID, productID, price) VALUES (11, 14, 200);
 INSERT INTO Stores_Products (storeID, productID, price) VALUES (7, 7, 38);
 INSERT INTO Stores_Products (storeID, productID, price) VALUES (4, 15, 15);
 
-INSERT INTO Customers (customerID, firstName, lastName, email, streetAddress, city, province, country) 
-VALUES (1, 'mahsa', 'sadeghi', 'msadeghi@dawsoncollege.qc.ca', 'Dawson College', 'Montreal', 'Quebec', 'Canada');
-INSERT INTO Customers (customerID, firstName, lastName, email, streetAddress, city, province, country) 
-VALUES (2, 'alex', 'brown', 'alex@gmail.com', '090 boul saint laurent', 'Montreal', 'Quebec', 'Canada');
-INSERT INTO Customers (customerID, firstName, lastName, email, streetAddress, city, province, country) 
-VALUES (3, 'martin', 'alexandre', 'marting@yahoo.com', NULL, 'Brossard', 'Quebec', 'Canada');
-INSERT INTO Customers (customerID, firstName, lastName, email, streetAddress, city, province, country) 
-VALUES (4, 'daneil', 'hanne', 'daneil@yahoo.com', '100 Atwater Street', 'Toronto', 'Ontario', 'Canada');
-INSERT INTO Customers (customerID, firstName, lastName, email, streetAddress, city, province, country) 
-VALUES (5, 'martin', 'alexandre', 'marting@yahoo.com', NULL, 'Brossard', 'Quebec', 'Canada');
-INSERT INTO Customers (customerID, firstName, lastName, email, streetAddress, city, province, country) 
-VALUES (6, 'John', 'boura', 'bdoura@gmail.com', '100 Young Street', 'Toronto', 'Ontario', 'Canada');
-INSERT INTO Customers (customerID, firstName, lastName, email, streetAddress, city, province, country) 
-VALUES (7, 'Ari', 'brown', 'b.a@gmail.com', NULL, NULL, NULL, NULL);
-INSERT INTO Customers (customerID, firstName, lastName, email, streetAddress, city, province, country) 
-VALUES (8, 'Amanda', 'Harry', 'am.harry@yahoo.com', '100 boul saint laurent', 'Montreal', 'Quebec', 'Canada');
-INSERT INTO Customers (customerID, firstName, lastName, email, streetAddress, city, province, country) 
-VALUES (9, 'Jack', 'Johnson', 'johnson.a@gmail.com', NULL, 'Calgary', 'Alberta', 'Canada');
-INSERT INTO Customers (customerID, firstName, lastName, email, streetAddress, city, province, country) 
-VALUES (10, 'John', 'belle', 'abcd@yahoo.com', '105 Young Street', 'Toronto', 'Ontario', 'Canada');
-INSERT INTO Customers (customerID, firstName, lastName, email, streetAddress, city, province, country) 
-VALUES (11, 'martin', 'Li', 'm.li@gmail.com', '87 boul saint laurent', 'Montreal', 'Quebec', 'Canada');
-INSERT INTO Customers (customerID, firstName, lastName, email, streetAddress, city, province, country) 
-VALUES (12, 'olivia', 'smith', 'smith@hotmail.com', '76 boul decalthon', 'Laval', 'Quebec', 'Canada');
-INSERT INTO Customers (customerID, firstName, lastName, email, streetAddress, city, province, country) 
-VALUES (13, 'Noah', 'Garcia', 'g.noah@yahoo.com', '22222 Happy Street', 'Laval', 'Quebec', 'Canada');
-INSERT INTO Customers (customerID, firstName, lastName, email, streetAddress, city, province, country) 
-VALUES (14, 'mahsa', 'sadeghi', 'ms@gmail.com', '104 Gill Street', 'Toronto', 'Ontario', 'Canada');
+INSERT INTO Customers (firstName, lastName, email, streetAddress, city, province, country) 
+VALUES ('mahsa', 'sadeghi', 'msadeghi@dawsoncollege.qc.ca', 'Dawson College', 'Montreal', 'Quebec', 'Canada');
+INSERT INTO Customers (firstName, lastName, email, streetAddress, city, province, country) 
+VALUES ('alex', 'brown', 'alex@gmail.com', '090 boul saint laurent', 'Montreal', 'Quebec', 'Canada');
+INSERT INTO Customers (firstName, lastName, email, streetAddress, city, province, country) 
+VALUES ('martin', 'alexandre', 'marting@yahoo.com', NULL, 'Brossard', 'Quebec', 'Canada');
+INSERT INTO Customers (firstName, lastName, email, streetAddress, city, province, country) 
+VALUES ('daneil', 'hanne', 'daneil@yahoo.com', '100 Atwater Street', 'Toronto', 'Ontario', 'Canada');
+INSERT INTO Customers (firstName, lastName, email, streetAddress, city, province, country) 
+VALUES ('martin', 'alexandre', 'marting@yahoo.com', NULL, 'Brossard', 'Quebec', 'Canada');
+INSERT INTO Customers (firstName, lastName, email, streetAddress, city, province, country) 
+VALUES ('John', 'boura', 'bdoura@gmail.com', '100 Young Street', 'Toronto', 'Ontario', 'Canada');
+INSERT INTO Customers (firstName, lastName, email, streetAddress, city, province, country) 
+VALUES ('Ari', 'brown', 'b.a@gmail.com', NULL, NULL, NULL, NULL);
+INSERT INTO Customers (firstName, lastName, email, streetAddress, city, province, country) 
+VALUES ('Amanda', 'Harry', 'am.harry@yahoo.com', '100 boul saint laurent', 'Montreal', 'Quebec', 'Canada');
+INSERT INTO Customers (firstName, lastName, email, streetAddress, city, province, country) 
+VALUES ('Jack', 'Johnson', 'johnson.a@gmail.com', NULL, 'Calgary', 'Alberta', 'Canada');
+INSERT INTO Customers (firstName, lastName, email, streetAddress, city, province, country) 
+VALUES ('John', 'belle', 'abcd@yahoo.com', '105 Young Street', 'Toronto', 'Ontario', 'Canada');
+INSERT INTO Customers (firstName, lastName, email, streetAddress, city, province, country) 
+VALUES ('martin', 'Li', 'm.li@gmail.com', '87 boul saint laurent', 'Montreal', 'Quebec', 'Canada');
+INSERT INTO Customers (firstName, lastName, email, streetAddress, city, province, country) 
+VALUES ('olivia', 'smith', 'smith@hotmail.com', '76 boul decalthon', 'Laval', 'Quebec', 'Canada');
+INSERT INTO Customers (firstName, lastName, email, streetAddress, city, province, country) 
+VALUES ('Noah', 'Garcia', 'g.noah@yahoo.com', '22222 Happy Street', 'Laval', 'Quebec', 'Canada');
+INSERT INTO Customers (firstName, lastName, email, streetAddress, city, province, country) 
+VALUES ('mahsa', 'sadeghi', 'ms@gmail.com', '104 Gill Street', 'Toronto', 'Ontario', 'Canada');
 
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (1, 1, 1, TO_DATE('4/21/2023', 'MM/DD/YYYY'));
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (2, 2, 2, TO_DATE('10/23/2023', 'MM/DD/YYYY'));
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (3, 3, 3, TO_DATE('10/1/2023', 'MM/DD/YYYY'));
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (4, 4, 4, TO_DATE('10/23/2023', 'MM/DD/YYYY'));
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (2, 5, 5, TO_DATE('10/23/2023', 'MM/DD/YYYY'));
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (3, 6, 6, TO_DATE('10/10/2023', 'MM/DD/YYYY'));
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (1, 7, 7, TO_DATE('10/11/2023', 'MM/DD/YYYY'));
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (6, 8, 8, NULL);
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (7, 9, 9, NULL);
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (8, 10, 10, NULL);
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (9, 11, 2, TO_DATE('5/6/2020', 'MM/DD/YYYY'));
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (3, 12, 6, TO_DATE('9/12/2019', 'MM/DD/YYYY'));
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (1, 13, 7, TO_DATE('10/11/2010', 'MM/DD/YYYY'));
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (1, 14, 2, TO_DATE('5/6/2022', 'MM/DD/YYYY'));
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (14, 15, 7, TO_DATE('10/7/2023', 'MM/DD/YYYY'));
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (10, 16, 8, TO_DATE('8/10/2023', 'MM/DD/YYYY'));
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (2, 17, 5, TO_DATE('10/23/2023', 'MM/DD/YYYY'));
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (2, 18, 7, TO_DATE('10/2/2023', 'MM/DD/YYYY'));
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (11, 19, 1, TO_DATE('4/3/2019', 'MM/DD/YYYY'));
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (12, 20, 2, TO_DATE('12/29/2021', 'MM/DD/YYYY'));
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (13, 21, 11, TO_DATE('1/20/2020', 'MM/DD/YYYY'));
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (1, 22, 7, TO_DATE('10/11/2022', 'MM/DD/YYYY'));
-INSERT INTO Orders (customerID, orderID, storeID, orderDate) 
-VALUES (12, 23, 4, TO_DATE('12/29/2021', 'MM/DD/YYYY'));
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (1, 1, TO_DATE('4/21/2023', 'MM/DD/YYYY'));
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (2, 2, TO_DATE('10/23/2023', 'MM/DD/YYYY'));
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (3, 3, TO_DATE('10/1/2023', 'MM/DD/YYYY'));
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (4, 4, TO_DATE('10/23/2023', 'MM/DD/YYYY'));
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (2, 5, TO_DATE('10/23/2023', 'MM/DD/YYYY'));
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (3, 6, TO_DATE('10/10/2023', 'MM/DD/YYYY'));
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (1, 7, TO_DATE('10/11/2023', 'MM/DD/YYYY'));
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (6, 8, NULL);
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (7, 9, NULL);
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (8, 10, NULL);
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (9, 2, TO_DATE('5/6/2020', 'MM/DD/YYYY'));
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (3, 6, TO_DATE('9/12/2019', 'MM/DD/YYYY'));
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (1, 7, TO_DATE('10/11/2010', 'MM/DD/YYYY'));
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (1, 2, TO_DATE('5/6/2022', 'MM/DD/YYYY'));
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (14, 7, TO_DATE('10/7/2023', 'MM/DD/YYYY'));
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (10, 8, TO_DATE('8/10/2023', 'MM/DD/YYYY'));
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (2, 5, TO_DATE('10/23/2023', 'MM/DD/YYYY'));
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (2, 7, TO_DATE('10/2/2023', 'MM/DD/YYYY'));
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (11, 1, TO_DATE('4/3/2019', 'MM/DD/YYYY'));
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (12, 2, TO_DATE('12/29/2021', 'MM/DD/YYYY'));
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (13, 11, TO_DATE('1/20/2020', 'MM/DD/YYYY'));
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (1, 7, TO_DATE('10/11/2022', 'MM/DD/YYYY'));
+INSERT INTO Orders (customerID, storeID, orderDate) 
+VALUES (12, 4, TO_DATE('12/29/2021', 'MM/DD/YYYY'));
 
 INSERT INTO Orders_Products (orderID, productID, quantity) VALUES (1, 1, 1);
 INSERT INTO Orders_Products (orderID, productID, quantity) VALUES (2, 2, 2);
@@ -300,54 +300,72 @@ INSERT INTO Orders_Products (orderID, productID, quantity) VALUES (21, 14, 1);
 INSERT INTO Orders_Products (orderID, productID, quantity) VALUES (22, 7, 1);
 INSERT INTO Orders_Products (orderID, productID, quantity) VALUES (23, 15, 3);
 
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (4, 0, 'It was affordable.', 1, 1, 1);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (3, 0, 'Quality was not good', 2, 2, 2);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (2, 1, NULL, 3, 3, 3);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (5, 0, 'Highly recommend', 4, 4, 4);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (1, 0, NULL, 5, 5, 2);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (1, 0, 'Did not worth the price', 6, 6, 3);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (1, 0, 'Missing some parts', 7, 7, 1);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (5, 1, 'Trash', 8, 8, 6);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (2, NULL, NULL, 9, 9, 7);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (5, NULL, NULL, 10, 10, 8);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (4, NULL, NULL, 11, 11, 9);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (3, NULL, NULL, 12, 6, 3);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (1, 0, 'Missing some parts', 13, 12, 1);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (4, NULL, NULL, 14, 11, 1);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (1, 0, 'Great product', 15, 12, 14);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (5, 1, 'Bad quality', 16, 8, 10);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (1, 0, NULL, 17, 3, 2);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (4, 0, NULL, 18, 5, 2);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (4, NULL, NULL, 19, 13, 11);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (5, NULL, NULL, 20, 15, 12);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (1, 2, 'Worse car I have driven!', 21, 7, 13);
-INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
-VALUES (4, NULL, NULL, 22, 15, 12);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (4, 0, 'It was affordable.', 1, 1);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (3, 0, 'Quality was not good', 2, 2);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (2, 1, NULL, 3, 3);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (5, 0, 'Highly recommend', 4, 4);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (1, 0, NULL, 5, 2);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (1, 0, 'Did not worth the price', 6, 3);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (1, 0, 'Missing some parts', 7, 1);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (5, 1, 'Trash', 8, 6);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (2, NULL, NULL, 9, 7);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (5, NULL, NULL, 10, 8);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (4, NULL, NULL, 11, 9);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (3, NULL, NULL, 6, 3);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (1, 0, 'Missing some parts', 12, 1);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (4, NULL, NULL, 11, 1);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (1, 0, 'Great product', 12, 14);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (5, 1, 'Bad quality',  8, 10);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (1, 0, NULL, 3, 2);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (4, 0, NULL, 5, 2);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (4, NULL, NULL, 13, 11);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (5, NULL, NULL, 15, 12);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (1, 2, 'Worse car I have driven!', 7, 13);
+INSERT INTO Reviews (star, flagNums, description, productID, customerID)
+VALUES (4, NULL, NULL, 15, 12);
 
 
 /**BIANCA**/
 
+/**CREATE OR REPLACE TYPE product_type AS OBJECT(
+    productID NUMBER(2),
+    quantity NUMBER(8)
+);
+/
+CREATE OR REPLACE TYPE ProductIDList AS TABLE OF product_type;
+
+CREATE OR REPLACE TYPE order_type AS OBJECT(
+    customerID      NUMBER(2),
+    storeID         NUMBER(2),
+    productIDs      ProductIDList
+);**/
+
+CREATE OR REPLACE TYPE order_type AS OBJECT(
+    customerID      NUMBER(2),
+    storeID         NUMBER(2)
+);
+/
 /* this function taks a productid as input and will calculate the total inventory for that product across all tables */
 CREATE OR REPLACE FUNCTION totalInventory(productIDsearch Products.productID%TYPE)
 RETURN NUMBER
@@ -389,17 +407,70 @@ CREATE OR REPLACE PACKAGE BODY calculations AS
     END;
 END calculations;
 /
-/* createOrder (orderID OUT, storeID, cusID): function that takes as input storeID and customerID */
 
+CREATE OR REPLACE PROCEDURE checkIfOrderStillValid(newOrderID IN Orders.orderID%TYPE)
+AS
+    numOrders NUMBER(2);
+BEGIN
+    SELECT
+        COUNT(*) INTO numOrders
+    FROM
+        Orders_Products
+    WHERE
+        orderID = newOrderID;
+    IF numOrders IS NULL OR numOrders = 0 THEN
+        DELETE FROM Orders WHERE orderID = newOrderID;
+    END IF;
+END;
+/
+
+BEGIN
+    checkIfOrderStillValid(26);
+END;
+/
+/* createOrder (orderID OUT, storeID, cusID): function that takes as input storeID and customerID */
+CREATE OR REPLACE PROCEDURE createOrder(
+orderObj IN order_type, 
+newOrderID OUT Orders.orderID%TYPE)
+AS
+BEGIN
+    
+    INSERT INTO Orders (customerID, storeID, orderDate)
+    VALUES (orderObj.customerID, orderObj.storeID, CURRENT_DATE)
+    RETURNING orderID INTO newOrderID;
+END;
+/
 /* addOrderItem(orderID -> from CreateOrder, prodID, quantity ): in jdbc, use a loop to call addOrderItem for every product they add to their order 
 this procedure will add a new order item into the database */
 CREATE OR REPLACE PROCEDURE addOrderItem(
     newOrderID IN Orders_Products.orderID%TYPE,
     newProductID IN Orders_Products.productID%TYPE,
-    newQuantity IN Orders_Products.quantity%TYPE)
+    newQuantity IN OUT Orders_Products.quantity%TYPE)
 AS
+    numTotalProducts NUMBER;
+    notEnoughStock EXCEPTION;
 BEGIN
+    SELECT
+        SUM(quantity) INTO numTotalProducts
+    FROM
+        Warehouses_Products
+    WHERE
+        productID = newProductID;
+    IF numTotalProducts < newQuantity THEN
+        RAISE notEnoughStock;
+    END IF;
     
+    FOR warehouse IN (SELECT * FROM Warehouses_Products WHERE productID = newProductID) LOOP
+        IF warehouse.quantity >= newQuantity THEN
+            UPDATE Warehouses_Products SET quantity = warehouse.quantity - newQuantity 
+            WHERE warehouseID = warehouse.warehouseID;
+            CONTINUE;
+        ELSIF warehouse.quantity < newQuantity THEN
+            newQuantity := newQuantity - warehouse.quantity;
+            UPDATE Warehouses_Products SET quantity = 0 
+            WHERE warehouseID = warehouse.warehouseID;
+        END IF;
+    END LOOP;
     INSERT INTO Orders_Products
     VALUES(newOrderID, newProductID, newQuantity);
 EXCEPTION
@@ -442,20 +513,6 @@ BEGIN
         VALUES(:NEW.reviewID, :NEW.ProductID, :NEW.CustomerID, :NEW.star, :NEW.flagNums, :NEW.description, CURRENT_DATE, 'INSERT');
     END IF;
 END;
-/
-
-CREATE OR REPLACE TYPE product_type AS OBJECT(
-    productID NUMBER(2),
-    quantity NUMBER(8)
-);
-/
-CREATE OR REPLACE TYPE ProductIDList AS TABLE OF product_type;
-
-CREATE OR REPLACE TYPE order_type AS OBJECT(
-    customerID      NUMBER(2),
-    storeID         NUMBER(2),
-    productIDs      ProductIDList
-);
 /
 
 
