@@ -101,6 +101,12 @@ CREATE TABLE LogReviewModification(
     modificationType    VARCHAR2(20)    NOT NULL
 );
 
+CREATE TABLE Loglogins(
+    username        VARCHAR2(20),
+    dateLogged      DATE
+);
+
+
 /** inserts **/
 INSERT INTO Stores (name) 
 VALUES ('marche adonis');
@@ -557,6 +563,7 @@ CREATE OR REPLACE FUNCTION calculateAvgReviewScore(fproductID Reviews.productid%
     EXCEPTION 
         WHEN OTHERS THEN 
             dbms_output.put_line('something went wrong' || SQLERRM);
+            RAISE;
     END;
 
 /
@@ -591,12 +598,30 @@ CREATE OR REPLACE PROCEDURE flagReview(pReviewID Reviews.reviewid%TYPE)
 /
 
 CREATE OR REPLACE TYPE review_type AS OBJECT(
-    productID       ,
-    storeID         NUMBER(2)
+    productID       NUMBER(2),
+    customerID      NUMBER(2),
+    star            NUMBER(1),
+    flagnums        NUMBER(1),
+    description     VARCHAR2(100)
 );
+/
+/**
+*This procedure adds a review into the Reviews table
+*/
+CREATE OR REPLACE PROCEDURE createReview(reviewObj IN review_type)
+    AS
+    
+    BEGIN
+        INSERT INTO Reviews (productid, customerid, star, flagnums, description)
+            VALUES (reviewObj.productID, reviewObj.customerID, reviewObj.star, reviewObj.flagnums, reviewObj.description);
+    
+    EXCEPTION 
+        WHEN OTHERS THEN 
+            dbms_output.put_line('something went wrong');
+            RAISE;
+END;
 
-/**proceudre createReview(reviewObj) --> 
- INSERT INTO REVIEWS (VALUES) (reviewobj.customerId)**/
+/
  
 /**
 *This procedure deletes a warehouse when taken in a warehouseid 
@@ -610,13 +635,9 @@ CREATE OR REPLACE PROCEDURE removeWarehouse(pWarehouseID Warehouses.warehouseid%
     EXCEPTION
         WHEN OTHERS THEN
             dbms_output.put_line('something went wrong');
+            RAISE;
     END;
 /
-
-
-
-
-
 
 DECLARE 
     warehouseID Warehouses.warehouseid%TYPE := 6;
@@ -627,5 +648,10 @@ EXCEPTION
     WHEN OTHERS THEN 
         dbms_output.put_line('something went wrong');
 END;
+
 /
+--LOGGINGS BELOW
+CREATE OR REPLACE PROCEDURE logLogin (username IN Loglogins.)
+
+
 /****/
