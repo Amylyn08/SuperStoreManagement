@@ -449,6 +449,7 @@ CREATE OR REPLACE PROCEDURE addOrderItem(
 AS
     numTotalProducts NUMBER;
     notEnoughStock EXCEPTION;
+    PRAGMA EXCEPTION_INIT(notEnoughStock, -20001);
 BEGIN
     SELECT
         SUM(quantity) INTO numTotalProducts
@@ -457,7 +458,7 @@ BEGIN
     WHERE
         productID = newProductID;
     IF numTotalProducts < newQuantity THEN
-        RAISE notEnoughStock;
+        RAISE_APPLICATION_ERROR( -20001, 'This product does not have enough stock.' );
     END IF;
     
     FOR warehouse IN (SELECT * FROM Warehouses_Products WHERE productID = newProductID) LOOP
@@ -474,6 +475,9 @@ BEGIN
     INSERT INTO Orders_Products
     VALUES(newOrderID, newProductID, newQuantity);
 EXCEPTION
+    WHEN notEnoughStock THEN
+        dbms_output.put_line('This product does not have any stock left: ' || SQLERRM);
+        RAISE;
     WHEN OTHERS THEN
         dbms_output.put_line('Something went wrong, see block' || SQLERRM);
         RAISE;
