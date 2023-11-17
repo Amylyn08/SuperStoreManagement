@@ -40,4 +40,13 @@ public class SuperstoreServices {
         return(this.conn != null && !this.connection.isClosed());
     }
 
+    /********** BIANCA *********/
+
+
+    /*******************/
+    
+    /********** AMY *********/
+
+    /*******************/
+
 }
