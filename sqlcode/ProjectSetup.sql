@@ -140,20 +140,20 @@ VALUES ('Warehouse F', '16 Whitlock Rd', NULL, 'Alberta', 'Canada');
 
 /*warehouses_stores???*/
 
-INSERT INTO Products (name, category) VALUES ('laptop ASUS 104S', 'electronics');
+INSERT INTO Products (name, category) VALUES ('laptop ASUS 104S', 'Electronics');
 INSERT INTO Products (name, category) VALUES ('apple', 'Grocery');
 INSERT INTO Products (name, category) VALUES ('SIMS CD', 'Video Games');
-INSERT INTO Products (name, category) VALUES ('orange', 'grocery');
+INSERT INTO Products (name, category) VALUES ('orange', 'Grocery');
 INSERT INTO Products (name, category) VALUES ('Barbie Movie', 'DVD');
 INSERT INTO Products (name, category) VALUES ('L''Oreal Normal Hair', 'Health');
 INSERT INTO Products (name, category) VALUES ('BMW iX Lego', 'Toys');
 INSERT INTO Products (name, category) VALUES ('BMW i6', 'Cars');
 INSERT INTO Products (name, category) VALUES ('Truck 500c', 'Vehicle');
 INSERT INTO Products (name, category) VALUES ('paper towel', 'Beauty');
-INSERT INTO Products (name, category) VALUES ('plum', 'grocery');
+INSERT INTO Products (name, category) VALUES ('plum', 'Grocery');
 INSERT INTO Products (name, category) VALUES ('Lamborghini Lego', 'Toys');
-INSERT INTO Products (name, category) VALUES ('chicken', 'grocery');
-INSERT INTO Products (name, category) VALUES ('PS5', 'electronics');
+INSERT INTO Products (name, category) VALUES ('chicken', 'Grocery');
+INSERT INTO Products (name, category) VALUES ('PS5', 'Electronics');
 INSERT INTO Products (name, category) VALUES ('pasta', 'Grocery');
 INSERT INTO Products (name, category) VALUES ('tomato', 'Grocery');
 INSERT INTO Products (name, category) VALUES ('Train X745', 'Vehicle');
@@ -300,52 +300,53 @@ INSERT INTO Orders_Products (orderID, productID, quantity) VALUES (21, 14, 1);
 INSERT INTO Orders_Products (orderID, productID, quantity) VALUES (22, 7, 1);
 INSERT INTO Orders_Products (orderID, productID, quantity) VALUES (23, 15, 3);
 
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (4, 0, 'It was affordable.', 1, 1);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (3, 0, 'Quality was not good', 2, 2);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (2, 1, NULL, 3, 3);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (5, 0, 'Highly recommend', 4, 4);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (1, 0, NULL, 5, 2);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (1, 0, 'Did not worth the price', 6, 3);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (1, 0, 'Missing some parts', 7, 1);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (5, 1, 'Trash', 8, 6);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (2, NULL, NULL, 9, 7);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (5, NULL, NULL, 10, 8);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (4, NULL, NULL, 11, 9);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (3, NULL, NULL, 6, 3);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (1, 0, 'Missing some parts', 12, 1);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (4, NULL, NULL, 11, 1);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (1, 0, 'Great product', 12, 14);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (5, 1, 'Bad quality',  8, 10);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (1, 0, NULL, 3, 2);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (4, 0, NULL, 5, 2);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (4, NULL, NULL, 13, 11);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (5, NULL, NULL, 15, 12);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (1, 2, 'Worse car I have driven!', 7, 13);
-INSERT INTO Reviews (star, flagNums, description, productID, customerID)
-VALUES (4, NULL, NULL, 15, 12);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (4, 0, 'It was affordable.', 1, 1, 1);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (3, 0, 'Quality was not good', 2, 2, 2);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (2, 1, NULL, 3, 3, 3);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (5, 0, 'Highly recommend', 4, 4, 4);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (1, 0, NULL, 5, 5, 2);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (1, 0, 'Did not worth the price', 6, 6, 3);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (1, 0, 'Missing some parts', 7, 7, 1);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (5, 1, 'Trash', 8, 8, 6);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (2, 0, NULL, 9, 9, 7);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (5, 0, NULL, 10, 10, 8);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (4, 0, NULL, 11, 11, 9);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (3, 0, NULL, 12, 6, 3);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (1, 0, 'Missing some parts', 13, 12, 1);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (4, 0, NULL, 14, 11, 1);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (1, 0, 'Great product', 15, 12, 14);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (5, 1, 'Bad quality', 16, 8, 10);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (1, 0, NULL, 17, 3, 2);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (4, 0, NULL, 18, 5, 2);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (4, 0, NULL, 19, 13, 11);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (5, 0, NULL, 20, 15, 12);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (1, 2, 'Worse car I have driven!', 21, 7, 13);
+INSERT INTO Reviews (star, flagNums, description, reviewID, productID, customerID)
+VALUES (4, 0, NULL, 22, 15, 12);
 
 
+/
 /**BIANCA**/
 
 /**CREATE OR REPLACE TYPE product_type AS OBJECT(
@@ -518,9 +519,113 @@ END;
 
 /****/
 
+
 /**AMY**/
 
+/**
+*
+*/
+CREATE OR REPLACE FUNCTION numOrders(fproductID Products.productid%TYPE) RETURN NUMBER 
+    AS
+        results NUMBER(3);
+    BEGIN 
+        SELECT COUNT(orderid) INTO results 
+            FROM Orders_products
+            WHERE productid = fproductID;
+    
+        RETURN results;
+    EXCEPTION
+        WHEN OTHERS THEN
+            dbms_output.put_line('something went wrong');
+            RAISE;
+    END;
+/
+/**
+*This function calculates the average score of a product.
+*returns the average
+*/
+CREATE OR REPLACE FUNCTION calculateAvgReviewScore(fproductID Reviews.productid%TYPE) RETURN NUMBER
+    AS
+        averageScore NUMBER(4,2);
+    BEGIN
+        SELECT AVG(star) INTO averageScore 
+            FROM Reviews 
+            WHERE productid = fproductID;
+        
+        RETURN averageScore;
+    
+    EXCEPTION 
+        WHEN OTHERS THEN 
+            dbms_output.put_line('something went wrong' || SQLERRM);
+    END;
+
+/
+/**
+*Takes the reviewID, adds  1  to the current flagNums 
+*Valdation: if flagNum >=2, delete row with that reviewID
+*
+**/
+CREATE OR REPLACE PROCEDURE flagReview(pReviewID Reviews.reviewid%TYPE) 
+    AS
+        oldFlagNum NUMBER(2) := 0;
+    BEGIN
+        SELECT flagnums INTO oldFlagNum
+        FROM Reviews
+        WHERE reviewid = pReviewID;
+        
+        oldFlagNum := oldFlagNum + 1;
+        
+        IF (oldFlagNum >= 2) THEN
+            DELETE FROM Reviews WHERE reviewid = pReviewID;
+        ELSE
+            UPDATE Reviews SET flagnums = oldFlagNum
+            WHERE reviewid = pReviewID;
+        END IF;
+        
+    EXCEPTION 
+        WHEN OTHERS THEN 
+            dbms_output.put_line('something went wrong' || SQLERRM);
+        RAISE;
+        
+    END;
+/
+
+CREATE OR REPLACE TYPE review_type AS OBJECT(
+    productID       ,
+    storeID         NUMBER(2)
+);
+
+/**proceudre createReview(reviewObj) --> 
+ INSERT INTO REVIEWS (VALUES) (reviewobj.customerId)**/
+ 
+/**
+*This procedure deletes a warehouse when taken in a warehouseid 
+*/
+CREATE OR REPLACE PROCEDURE removeWarehouse(pWarehouseID Warehouses.warehouseid%TYPE)
+    AS
+    
+    BEGIN
+        DELETE FROM Warehouses WHERE warehouseid = pWarehouseID;
+        
+    EXCEPTION
+        WHEN OTHERS THEN
+            dbms_output.put_line('something went wrong');
+    END;
+/
 
 
 
+
+
+
+DECLARE 
+    warehouseID Warehouses.warehouseid%TYPE := 6;
+BEGIN
+    removeWarehouse(warehouseID);
+    dbms_output.put_line('deleted!');
+EXCEPTION 
+    WHEN OTHERS THEN 
+        dbms_output.put_line('something went wrong');
+END;
+/
 /****/
