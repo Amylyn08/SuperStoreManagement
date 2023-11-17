@@ -349,18 +349,6 @@ VALUES (4, 0, NULL, 22, 15, 12);
 /
 /**BIANCA**/
 
-/**CREATE OR REPLACE TYPE product_type AS OBJECT(
-    productID NUMBER(2),
-    quantity NUMBER(8)
-);
-/
-CREATE OR REPLACE TYPE ProductIDList AS TABLE OF product_type;
-
-CREATE OR REPLACE TYPE order_type AS OBJECT(
-    customerID      NUMBER(2),
-    storeID         NUMBER(2),
-    productIDs      ProductIDList
-);**/
 
 CREATE OR REPLACE TYPE order_type AS OBJECT(
     customerID      NUMBER(2),
@@ -441,6 +429,7 @@ BEGIN
     RETURNING orderID INTO newOrderID;
 END;
 /
+
 /* addOrderItem(orderID -> from CreateOrder, prodID, quantity ): in jdbc, use a loop to call addOrderItem for every product they add to their order 
 this procedure will add a new order item into the database */
 CREATE OR REPLACE PROCEDURE addOrderItem(
