@@ -589,6 +589,12 @@ CREATE OR REPLACE PROCEDURE flagReview(pReviewID Reviews.reviewid%TYPE)
         
     END;
 /
+
+CREATE OR REPLACE TYPE review_type AS OBJECT(
+    productID       ,
+    storeID         NUMBER(2)
+);
+
 /**proceudre createReview(reviewObj) --> 
  INSERT INTO REVIEWS (VALUES) (reviewobj.customerId)**/
  
@@ -600,15 +606,23 @@ CREATE OR REPLACE PROCEDURE removeWarehouse(pWarehouseID Warehouses.warehouseid%
     
     BEGIN
         DELETE FROM Warehouses WHERE warehouseid = pWarehouseID;
+        
     EXCEPTION
         WHEN OTHERS THEN
-            dbms_output.put_line('something went wrong' || SQLEERM);
+            dbms_output.put_line('something went wrong');
     END;
+/
+
+
+
+
+
 
 DECLARE 
-    reviewID orders_products.productid%TYPE := 22;
+    warehouseID Warehouses.warehouseid%TYPE := 6;
 BEGIN
-    flagReview(reviewID);
+    removeWarehouse(warehouseID);
+    dbms_output.put_line('deleted!');
 EXCEPTION 
     WHEN OTHERS THEN 
         dbms_output.put_line('something went wrong');
