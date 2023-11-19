@@ -35,6 +35,9 @@ public class App
         }
     }
 
+    /**
+     * this function creates an order in the Orders table using user input
+     */
     public static void placeOrder() throws SQLException, ClassNotFoundException
     {
         boolean isSuccessful = false;
@@ -65,6 +68,12 @@ public class App
         addOrderItems(orderID);
     }
 
+    /**
+     * this function takes the orderID of the order recently added and adds the items 
+     * the user selects into the Orders_Products table
+     * @param orderID - represents the ID of the order created
+     * @throws SQLException - may throw an SQL exception
+     */
     public static void addOrderItems(int orderID) throws SQLException
     {
         String addMore = "yes";
