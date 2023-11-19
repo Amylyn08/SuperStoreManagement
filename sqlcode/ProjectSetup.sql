@@ -583,11 +583,6 @@ CREATE OR REPLACE PROCEDURE flagReview(pReviewID Reviews.reviewid%TYPE)
     END;
 /
 
-CREATE OR REPLACE TYPE review_type AS OBJECT(
-    productID       ,
-    storeID         NUMBER(2)
-);
-
 /**proceudre createReview(reviewObj) --> 
  INSERT INTO REVIEWS (VALUES) (reviewobj.customerId)**/
  
@@ -606,19 +601,37 @@ CREATE OR REPLACE PROCEDURE removeWarehouse(pWarehouseID Warehouses.warehouseid%
     END;
 /
 
+/****/
 
+/** getting table IDs **/
+CREATE OR REPLACE TYPE array_ids IS TABLE OF NUMBER(2);
+/
 
-
-
-
-DECLARE 
-    warehouseID Warehouses.warehouseid%TYPE := 6;
+/** this function will return a list containing all valid product IDs **/
+CREATE OR REPLACE FUNCTION getProductIDs
+RETURN array_ids
+AS
+    prod_ids array_ids;
 BEGIN
-    removeWarehouse(warehouseID);
-    dbms_output.put_line('deleted!');
-EXCEPTION 
-    WHEN OTHERS THEN 
-        dbms_output.put_line('something went wrong');
+    SELECT
+        productID BULK COLLECT INTO prod_ids
+    FROM
+        Products;
+    RETURN prod_ids;
 END;
 /
-/****/
+
+
+/** TESTING BLOCK **/
+DECLARE
+    product_ids array_ids;
+BEGIN
+    product_ids := getProductIDs();
+    FOR i IN 1 .. product_ids.COUNT LOOP
+        dbms_output.put_line(product_ids(i));
+    END LOOP;
+END;
+/
+
+
+
