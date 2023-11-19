@@ -621,17 +621,56 @@ BEGIN
 END;
 /
 
+/** this function will return a list containing all valid customer IDs **/
+CREATE OR REPLACE FUNCTION getCustomerIDs
+RETURN array_ids
+AS
+    cus_ids array_ids;
+BEGIN
+    SELECT
+        customerID BULK COLLECT INTO cus_ids
+    FROM
+        Customers;
+    RETURN cus_ids;
+END;
+/
+
+/** this function will return a list containing all valid warehouse IDs **/
+CREATE OR REPLACE FUNCTION getWarehouseIDs
+RETURN array_ids
+AS
+    warehouse_ids array_ids;
+BEGIN
+    SELECT
+        warehouseID BULK COLLECT INTO warehouse_ids
+    FROM
+        Warehouses;
+    RETURN warehouse_ids;
+END;
+/
+
+/** this function will return a list containing all valid store IDs **/
+CREATE OR REPLACE FUNCTION getStoreIDs
+RETURN array_ids
+AS
+    store_ids array_ids;
+BEGIN
+    SELECT
+        storeID BULK COLLECT INTO store_ids
+    FROM
+        Stores;
+    RETURN store_ids;
+END;
+/
+
 
 /** TESTING BLOCK **/
 DECLARE
     product_ids array_ids;
 BEGIN
-    product_ids := getProductIDs();
+    product_ids := getStoreIDs();
     FOR i IN 1 .. product_ids.COUNT LOOP
         dbms_output.put_line(product_ids(i));
     END LOOP;
 END;
 /
-
-
-
