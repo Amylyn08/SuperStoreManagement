@@ -631,6 +631,7 @@ BEGIN
         customerID BULK COLLECT INTO cus_ids
     FROM
         Customers;
+        
     RETURN cus_ids;
 END;
 /
@@ -664,13 +665,3 @@ END;
 /
 
 
-/** TESTING BLOCK **/
-DECLARE
-    product_ids array_ids;
-BEGIN
-    product_ids := getStoreIDs();
-    FOR i IN 1 .. product_ids.COUNT LOOP
-        dbms_output.put_line(product_ids(i));
-    END LOOP;
-END;
-/

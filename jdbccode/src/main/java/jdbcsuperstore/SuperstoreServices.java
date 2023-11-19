@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal;
+import java.sql.Array;
 
 public class SuperstoreServices {
     private Connection conn;
@@ -25,10 +28,10 @@ public class SuperstoreServices {
     {
         try 
         {
-            if(this.connectionActive())
+            if(!this.connectionActive())
             {
                 this.conn = DriverManager.getConnection(
-                    driver + "//" + host + ":" + port + "/pdbora19c.dawsoncollege.qc.ca",
+                    "jdbc:oracle:thin:@198.168.52.211:1521/pdbora19c.dawsoncollege.qc.ca",
                     user, password
                 );
             }
@@ -49,13 +52,96 @@ public class SuperstoreServices {
         return(this.conn != null && !this.conn.isClosed());
     }
 
+    /* CHECK VALIDITY OF IDs*/
+    public void isProductIDValid(int productID) throws SQLException
+    {
+        String orderProc = "{ ? = call getProductIDs()}";
+        CallableStatement stmt = conn.prepareCall(orderProc);
+        stmt.registerOutParameter(1, Types.ARRAY, "ARRAY_IDS");
+        stmt.execute();
+        Array productIDs = stmt.getArray(1);
+        BigDecimal[] resultArray = (BigDecimal[]) productIDs.getArray();
+        List<Integer> results = new ArrayList<Integer>();
+        for (BigDecimal id : resultArray)
+        {
+            results.add(id.intValue());
+        }
+        if (!results.contains(productID))
+        {
+            throw new IllegalArgumentException("invalid productID");
+        }
+        
+    }
+
+    public void isCustomerIDValid(int customerID) throws SQLException
+    {
+        String orderProc = "{ ? = call getCustomerIDs()}";
+        CallableStatement stmt = conn.prepareCall(orderProc);
+        stmt.registerOutParameter(1, Types.ARRAY, "ARRAY_IDS");
+        stmt.execute();
+        Array customerIDs = stmt.getArray(1);
+        BigDecimal[] resultArray = (BigDecimal[]) customerIDs.getArray();
+        List<Integer> results = new ArrayList<Integer>();
+        for (BigDecimal id : resultArray)
+        {
+            results.add(id.intValue());
+        }
+        if (!results.contains(customerID))
+        {
+            throw new IllegalArgumentException("invalid customerID");
+        }
+    }
+
+    public void isWarehouseIDValid(int warehouseID) throws SQLException
+    {
+        String orderProc = "{ ? = call getWarehouseIDs()}";
+        CallableStatement stmt = conn.prepareCall(orderProc);
+        stmt.registerOutParameter(1, Types.ARRAY, "ARRAY_IDS");
+        stmt.execute();
+        Array warehouseIDs = stmt.getArray(1);
+        BigDecimal[] resultArray = (BigDecimal[]) warehouseIDs.getArray();
+        List<Integer> results = new ArrayList<Integer>();
+        for (BigDecimal id : resultArray)
+        {
+            results.add(id.intValue());
+        }
+        if (!results.contains(warehouseID))
+        {
+            throw new IllegalArgumentException("invalid warehouseID");
+        }
+    }
+
+    public void isStoreIDValid(int storeID) throws SQLException
+    {
+        String orderProc = "{ ? = call getStoreIDs()}";
+        CallableStatement stmt = conn.prepareCall(orderProc);
+        stmt.registerOutParameter(1, Types.ARRAY, "ARRAY_IDS");
+        stmt.execute();
+        Array storeIDs = stmt.getArray(1);
+        BigDecimal[] resultArray = (BigDecimal[]) storeIDs.getArray();
+        List<Integer> results = new ArrayList<Integer>();
+        for (BigDecimal id : resultArray)
+        {
+            results.add(id.intValue());
+        }
+
+        if (!results.contains(storeID))
+        {
+            throw new IllegalArgumentException("invalid storeID");
+        }
+    } 
+
+    // functions and procedures here:
+
+    /********** BIANCA *********/
+
     /**
      * this function takes an Order object as input and creates a new order in the DB
      * @param orderObj - represents the order object
      * @return - int representing the new OrderID
      * @throws SQLException
      */
-    public int createOrderID(Order orderObj, List<Product> products) throws SQLException
+    public int createOrder(Order orderObj) throws SQLException
     {
         String orderProc = "{call createOrder(?, ?)}";
         CallableStatement stmt = conn.prepareCall(orderProc);
@@ -66,21 +152,15 @@ public class SuperstoreServices {
         return newOrderId;
     }
 
-    public void addOrderItem(int newOrderId, Product product) throws SQLException
+    public void addOrderItem(int newOrderId, int productID, int quantity) throws SQLException
     {
         String addItem = "{call addOrderItem(?, ?, ?)}";
         CallableStatement stmt = conn.prepareCall(addItem);
         stmt.setInt(1, newOrderId);
-        stmt.setInt(2, product.getQuantity());
-        stmt.setInt(3, product.getID());
+        stmt.setInt(2, productID);
+        stmt.setInt(3, quantity);
         stmt.execute();
     }
-
-
-    // functions and procedures here:
-
-    /********** BIANCA *********/
-
 
     /*******************/
     
