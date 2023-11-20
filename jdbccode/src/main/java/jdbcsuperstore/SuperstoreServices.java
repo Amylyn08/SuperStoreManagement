@@ -1,5 +1,4 @@
 package jdbcsuperstore;
-
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -29,6 +28,9 @@ public class SuperstoreServices {
                 this.conn = DriverManager.getConnection(
                         "jdbc:oracle:thin:@198.168.52.211:1521/pdbora19c.dawsoncollege.qc.ca",
                         user, password);
+                String logLogin = "{call logUserLogin(?)}";
+                CallableStatement stmt = this.conn.prepareCall(logLogin);
+                stmt.setString(1, user);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -153,8 +155,7 @@ public class SuperstoreServices {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public void createReview(int productID, int customerID, int star, String description)throws SQLException, ClassNotFoundException{
-        Review review = new Review(productID, customerID, star, description, this.conn);
+    public void createReview(Review review)throws SQLException, ClassNotFoundException{
         String createReview = "{call createReview(?)}";
         CallableStatement stmt = conn.prepareCall(createReview);
         stmt.setObject(1, review);
