@@ -19,7 +19,7 @@ public class App
         try {
             services = new SuperstoreServices("jdbc:oracle:thin:", "198.168.52.211", "1521", user, password);
             conn = services.getConnection();
-            removeProduct();
+            placeOrder();
 
         }
         catch(NullPointerException e)
@@ -81,9 +81,9 @@ public class App
         while (addMore.equals("yes") || addMore.equals("y"))
         {
             try {
-                System.out.println("Please enter the customerID associated with the order:");
+                System.out.println("Please enter the productID of the product you would like to add:");
                 int productID = Integer.parseInt(scan.nextLine());
-                System.out.println("Please enter the storeID associated with the order:");
+                System.out.println("Please enter the quantity of the product:");
                 int quantity = Integer.parseInt(scan.nextLine());
                 services.addOrderItem(orderID, productID, quantity);
                 System.out.println("your order item has been added successfully");

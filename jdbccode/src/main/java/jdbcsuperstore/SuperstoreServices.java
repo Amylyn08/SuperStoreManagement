@@ -164,6 +164,10 @@ public class SuperstoreServices {
      */
     public void addOrderItem(int newOrderId, int productID, int quantity) throws SQLException {
         isProductIDValid(productID);
+        if (totalInventory(productID) < quantity)
+        {
+            throw new IllegalArgumentException("product does not have enough stock");
+        }
         String addItem = "{call addOrderItem(?, ?, ?)}";
         CallableStatement stmt = conn.prepareCall(addItem);
         stmt.setInt(1, newOrderId);
