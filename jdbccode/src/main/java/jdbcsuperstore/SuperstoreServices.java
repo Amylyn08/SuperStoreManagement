@@ -144,7 +144,33 @@ public class SuperstoreServices {
     /*******************/
 
     /********** AMY *********/
-
+    /**
+     * This  method creates and inserts the review into the DB
+     * @param productID - represents the productID that holds the review
+     * @param customerID - represents the customer that is making the review
+     * @param star  -represents the star rating.
+     * @param description - represents the description of the rating.
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public void createReview(int productID, int customerID, int star, String description)throws SQLException, ClassNotFoundException{
+        Review review = new Review(productID, customerID, star, description, this.conn);
+        String createReview = "{call createReview(?)}";
+        CallableStatement stmt = conn.prepareCall(createReview);
+        stmt.setObject(1, review);
+        stmt.execute();
+    }
+    /**
+     * This method flags a review in the databse
+     * @param reviewID
+     * @throws SQLException
+     */
+    public void flagReview(int reviewID) throws SQLException{
+        String flagReview = "{call flagReview(?)}";
+        CallableStatement stmt = conn.prepareCall(flagReview);
+        stmt.setInt(1, reviewID);
+        stmt.execute();
+    }
     /*******************/
 
 }

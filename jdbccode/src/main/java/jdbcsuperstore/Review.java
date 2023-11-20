@@ -11,12 +11,12 @@ public class Review implements SQLData {
     private String description;
     private String sql_type = "REVIEW_TYPE";
 
-    public Review(int productID, int customerID, int star, int flagnums, String description, Connection conn)
+    public Review(int productID, int customerID, int star, String description, Connection conn)
             throws SQLException, ClassNotFoundException {
         this.productID = productID;
         this.customerID = customerID;
         this.star = star;
-        this.flagnums = flagnums;
+        this.flagnums = 0;
         this.description = description;
 
         Map map = conn.getTypeMap();
