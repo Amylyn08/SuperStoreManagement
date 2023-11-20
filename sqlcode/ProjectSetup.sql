@@ -119,6 +119,12 @@ CREATE TABLE LogWarehouseModification(
 /
 
 
+CREATE TABLE Loglogins(
+    username        VARCHAR2(20),
+    dateLogged      DATE
+);
+
+
 /** inserts **/
 INSERT INTO Stores (name) 
 VALUES ('marche adonis');
@@ -568,6 +574,7 @@ CREATE OR REPLACE FUNCTION calculateAvgReviewScore(fproductID Reviews.productid%
     EXCEPTION 
         WHEN OTHERS THEN 
             dbms_output.put_line('something went wrong' || SQLERRM);
+            RAISE;
     END;
 
 /
@@ -601,8 +608,36 @@ CREATE OR REPLACE PROCEDURE flagReview(pReviewID Reviews.reviewid%TYPE)
     END;
 /
 
+<<<<<<< HEAD
 /**proceudre createReview(reviewObj) --> 
  INSERT INTO REVIEWS (VALUES) (reviewobj.customerId)**/
+=======
+CREATE OR REPLACE TYPE review_type AS OBJECT(
+    productID       NUMBER(2),
+    customerID      NUMBER(2),
+    star            NUMBER(1),
+    flagnums        NUMBER(1),
+    description     VARCHAR2(100)
+);
+/
+/**
+*This procedure adds a review into the Reviews table
+*/
+CREATE OR REPLACE PROCEDURE createReview(reviewObj IN review_type)
+    AS
+    
+    BEGIN
+        INSERT INTO Reviews (productid, customerid, star, flagnums, description)
+            VALUES (reviewObj.productID, reviewObj.customerID, reviewObj.star, reviewObj.flagnums, reviewObj.description);
+    
+    EXCEPTION 
+        WHEN OTHERS THEN 
+            dbms_output.put_line('something went wrong');
+            RAISE;
+END;
+
+/
+>>>>>>> e6cdd4e08128428729281a19a7bd948105742edb
  
 /**
 *This procedure deletes a warehouse when taken in a warehouseid 
@@ -616,8 +651,10 @@ CREATE OR REPLACE PROCEDURE removeWarehouse(pWarehouseID Warehouses.warehouseid%
     EXCEPTION
         WHEN OTHERS THEN
             dbms_output.put_line('something went wrong');
+            RAISE;
     END;
 /
+<<<<<<< HEAD
 /**
 *This procedure logs the user login with their username and the data that they logged in at
 */
@@ -638,6 +675,11 @@ CREATE OR REPLACE TRIGGER beforeModifyingWarehouse
 BEFORE DELETE OR INSERT
 ON Warehouses_products
 FOR EACH ROW
+=======
+
+DECLARE 
+    warehouseID Warehouses.warehouseid%TYPE := 6;
+>>>>>>> e6cdd4e08128428729281a19a7bd948105742edb
 BEGIN
     IF DELETING THEN
         INSERT INTO Logwarehousemodification
@@ -659,6 +701,7 @@ EXCEPTION
     WHEN OTHERS THEN 
         dbms_output.put_line('something went wrong');
 END;
+<<<<<<< HEAD
 -------
 /
 
@@ -727,3 +770,12 @@ END;
 /
 
 
+=======
+
+/
+--LOGGINGS BELOW
+CREATE OR REPLACE PROCEDURE logLogin (username IN Loglogins.)
+
+
+/****/
+>>>>>>> e6cdd4e08128428729281a19a7bd948105742edb
