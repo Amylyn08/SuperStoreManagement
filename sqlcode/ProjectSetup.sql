@@ -349,18 +349,6 @@ VALUES (4, 0, NULL, 22, 15, 12);
 /
 /**BIANCA**/
 
-/**CREATE OR REPLACE TYPE product_type AS OBJECT(
-    productID NUMBER(2),
-    quantity NUMBER(8)
-);
-/
-CREATE OR REPLACE TYPE ProductIDList AS TABLE OF product_type;
-
-CREATE OR REPLACE TYPE order_type AS OBJECT(
-    customerID      NUMBER(2),
-    storeID         NUMBER(2),
-    productIDs      ProductIDList
-);**/
 
 CREATE OR REPLACE TYPE order_type AS OBJECT(
     customerID      NUMBER(2),
@@ -441,6 +429,7 @@ BEGIN
     RETURNING orderID INTO newOrderID;
 END;
 /
+
 /* addOrderItem(orderID -> from CreateOrder, prodID, quantity ): in jdbc, use a loop to call addOrderItem for every product they add to their order 
 this procedure will add a new order item into the database */
 CREATE OR REPLACE PROCEDURE addOrderItem(
@@ -450,6 +439,7 @@ CREATE OR REPLACE PROCEDURE addOrderItem(
 AS
     numTotalProducts NUMBER;
     notEnoughStock EXCEPTION;
+    PRAGMA EXCEPTION_INIT(notEnoughStock, -20001);
 BEGIN
     SELECT
         SUM(quantity) INTO numTotalProducts
@@ -458,7 +448,7 @@ BEGIN
     WHERE
         productID = newProductID;
     IF numTotalProducts < newQuantity THEN
-        RAISE notEnoughStock;
+        RAISE_APPLICATION_ERROR( -20001, 'This product does not have enough stock.' );
     END IF;
     
     FOR warehouse IN (SELECT * FROM Warehouses_Products WHERE productID = newProductID) LOOP
@@ -475,6 +465,9 @@ BEGIN
     INSERT INTO Orders_Products
     VALUES(newOrderID, newProductID, newQuantity);
 EXCEPTION
+    WHEN notEnoughStock THEN
+        dbms_output.put_line('This product does not have any stock left: ' || SQLERRM);
+        RAISE;
     WHEN OTHERS THEN
         dbms_output.put_line('Something went wrong, see block' || SQLERRM);
         RAISE;
@@ -590,11 +583,6 @@ CREATE OR REPLACE PROCEDURE flagReview(pReviewID Reviews.reviewid%TYPE)
     END;
 /
 
-CREATE OR REPLACE TYPE review_type AS OBJECT(
-    productID       ,
-    storeID         NUMBER(2)
-);
-
 /**proceudre createReview(reviewObj) --> 
  INSERT INTO REVIEWS (VALUES) (reviewobj.customerId)**/
  
@@ -613,19 +601,67 @@ CREATE OR REPLACE PROCEDURE removeWarehouse(pWarehouseID Warehouses.warehouseid%
     END;
 /
 
+/****/
 
+/** getting table IDs **/
+CREATE OR REPLACE TYPE array_ids IS TABLE OF NUMBER(2);
+/
 
-
-
-
-DECLARE 
-    warehouseID Warehouses.warehouseid%TYPE := 6;
+/** this function will return a list containing all valid product IDs **/
+CREATE OR REPLACE FUNCTION getProductIDs
+RETURN array_ids
+AS
+    prod_ids array_ids;
 BEGIN
-    removeWarehouse(warehouseID);
-    dbms_output.put_line('deleted!');
-EXCEPTION 
-    WHEN OTHERS THEN 
-        dbms_output.put_line('something went wrong');
+    SELECT
+        productID BULK COLLECT INTO prod_ids
+    FROM
+        Products;
+    RETURN prod_ids;
 END;
 /
-/****/
+
+/** this function will return a list containing all valid customer IDs **/
+CREATE OR REPLACE FUNCTION getCustomerIDs
+RETURN array_ids
+AS
+    cus_ids array_ids;
+BEGIN
+    SELECT
+        customerID BULK COLLECT INTO cus_ids
+    FROM
+        Customers;
+        
+    RETURN cus_ids;
+END;
+/
+
+/** this function will return a list containing all valid warehouse IDs **/
+CREATE OR REPLACE FUNCTION getWarehouseIDs
+RETURN array_ids
+AS
+    warehouse_ids array_ids;
+BEGIN
+    SELECT
+        warehouseID BULK COLLECT INTO warehouse_ids
+    FROM
+        Warehouses;
+    RETURN warehouse_ids;
+END;
+/
+
+/** this function will return a list containing all valid store IDs **/
+CREATE OR REPLACE FUNCTION getStoreIDs
+RETURN array_ids
+AS
+    store_ids array_ids;
+BEGIN
+    SELECT
+        storeID BULK COLLECT INTO store_ids
+    FROM
+        Stores;
+    RETURN store_ids;
+END;
+/
+
+
