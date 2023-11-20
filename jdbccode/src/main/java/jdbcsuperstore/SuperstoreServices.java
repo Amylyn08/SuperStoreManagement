@@ -31,6 +31,7 @@ public class SuperstoreServices {
                 String logLogin = "{call logUserLogin(?)}";
                 CallableStatement stmt = this.conn.prepareCall(logLogin);
                 stmt.setString(1, user);
+                stmt.execute();
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -155,7 +156,7 @@ public class SuperstoreServices {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public void createReview(Review review)throws SQLException, ClassNotFoundException{
+    public void createReview(Review review)throws SQLException{
         String createReview = "{call createReview(?)}";
         CallableStatement stmt = conn.prepareCall(createReview);
         stmt.setObject(1, review);
@@ -170,6 +171,46 @@ public class SuperstoreServices {
         String flagReview = "{call flagReview(?)}";
         CallableStatement stmt = conn.prepareCall(flagReview);
         stmt.setInt(1, reviewID);
+        stmt.execute();
+    }
+
+    /**
+     * This function gets the average review score for a product
+     * @param productID - the victim.
+     * @return - returns back the average review score.
+     * @throws SQLException
+     */
+    public double calculateAvgReviewScore(int productID) throws SQLException{
+        String gettingAvg = "{? = call calculateAvgReviewScore(?)}";
+        CallableStatement stmt = conn.prepareCall(gettingAvg);
+        stmt.setInt(2, productID);
+        stmt.execute();
+        double avgScore = stmt.getDouble(1);
+        return avgScore;
+    }
+    /**
+     * This function 
+     * @param productID
+     * @return
+     * @throws SQLException
+     */
+    public int numOrders(int productID) throws SQLException{
+        String sql = "{? = call numOrders(?)}";
+        CallableStatement stmt = conn.prepareCall(sql);
+        stmt.setInt(2, productID);
+        stmt.execute();
+        int num = stmt.getInt(1);
+        return num;
+    }
+    /**
+     * This function 
+     * @param warehouseID
+     * @throws SQLException
+     */
+    public void removeWarehouse(int warehouseID) throws SQLException{
+        String sql = "{call removeWarehouse(?)}";
+        CallableStatement stmt = conn.prepareCall(sql);
+        stmt.setInt(1, warehouseID);
         stmt.execute();
     }
     /*******************/

@@ -623,8 +623,8 @@ CREATE OR REPLACE PROCEDURE createReview(reviewObj IN review_type)
     AS
     
     BEGIN
-        INSERT INTO Reviews (productid, customerid, star, description)
-            VALUES (reviewObj.productID, reviewObj.customerID, reviewObj.star, reviewObj.description);
+        INSERT INTO Reviews (productid, customerid, star, flagnums, description)
+            VALUES (reviewObj.productID, reviewObj.customerID, reviewObj.star, 0, reviewObj.description);
     
     EXCEPTION 
         WHEN OTHERS THEN 
