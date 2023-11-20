@@ -608,10 +608,6 @@ CREATE OR REPLACE PROCEDURE flagReview(pReviewID Reviews.reviewid%TYPE)
     END;
 /
 
-<<<<<<< HEAD
-/**proceudre createReview(reviewObj) --> 
- INSERT INTO REVIEWS (VALUES) (reviewobj.customerId)**/
-=======
 CREATE OR REPLACE TYPE review_type AS OBJECT(
     productID       NUMBER(2),
     customerID      NUMBER(2),
@@ -637,7 +633,7 @@ CREATE OR REPLACE PROCEDURE createReview(reviewObj IN review_type)
 END;
 
 /
->>>>>>> e6cdd4e08128428729281a19a7bd948105742edb
+
  
 /**
 *This procedure deletes a warehouse when taken in a warehouseid 
@@ -654,7 +650,6 @@ CREATE OR REPLACE PROCEDURE removeWarehouse(pWarehouseID Warehouses.warehouseid%
             RAISE;
     END;
 /
-<<<<<<< HEAD
 /**
 *This procedure logs the user login with their username and the data that they logged in at
 */
@@ -670,16 +665,12 @@ CREATE OR REPLACE PROCEDURE logUserLogin(username Loglogins.username%TYPE)
             RAISE;
     END;
 /
+
 --this trigger logs in when a stock is added or deducted.
 CREATE OR REPLACE TRIGGER beforeModifyingWarehouse
 BEFORE DELETE OR INSERT
 ON Warehouses_products
 FOR EACH ROW
-=======
-
-DECLARE 
-    warehouseID Warehouses.warehouseid%TYPE := 6;
->>>>>>> e6cdd4e08128428729281a19a7bd948105742edb
 BEGIN
     IF DELETING THEN
         INSERT INTO Logwarehousemodification
@@ -701,10 +692,8 @@ EXCEPTION
     WHEN OTHERS THEN 
         dbms_output.put_line('something went wrong');
 END;
-<<<<<<< HEAD
--------
-/
 
+/
 
 /****/
 
@@ -769,13 +758,3 @@ BEGIN
 END;
 /
 
-
-=======
-
-/
---LOGGINGS BELOW
-CREATE OR REPLACE PROCEDURE logLogin (username IN Loglogins.)
-
-
-/****/
->>>>>>> e6cdd4e08128428729281a19a7bd948105742edb
