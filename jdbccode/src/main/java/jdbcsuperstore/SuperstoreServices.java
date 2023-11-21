@@ -107,7 +107,6 @@ public class SuperstoreServices {
         for (BigDecimal id : resultArray) {
             results.add(id.intValue());
         }
-
         if (!results.contains(storeID)) {
             throw new IllegalArgumentException("invalid storeID");
         }
@@ -213,6 +212,8 @@ public class SuperstoreServices {
         stmt.setInt(1, warehouseID);
         stmt.execute();
     }
+
+
     /*******************/
 
 }
