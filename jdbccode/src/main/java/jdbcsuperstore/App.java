@@ -21,7 +21,7 @@ public class App {
             conn = services.getConnection();
             // placeOrder();
             // System.out.println(services.totalInventory(20));
-            checkTotalProdInventory();
+            createReview();
 
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -145,4 +145,70 @@ public class App {
             }
         }
     }
+
+    public static void viewNumOrders() {
+        boolean isSuccessful = false;
+        while (!isSuccessful) {
+            try {
+                System.out.println("Enter productid to view it's total orders:");
+                int productID = Integer.parseInt(scan.nextLine());
+                int total = services.numOrders(productID);
+                System.out.println("For productID of " + productID + ", there are " + total + " orders placed");
+                isSuccessful = true;
+            } catch (SQLException e) {
+                e.getMessage();
+            } catch (NumberFormatException e) {
+                System.out.println("Enter an integer please");
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    public static void getAvgReviewScoreforProduct() {
+        boolean isSuccessful = false;
+        while (!isSuccessful) {
+            try {
+                System.out.println("Enter a productID to view it's average review score:");
+                int productID = Integer.parseInt(scan.nextLine());
+                double result = services.calculateAvgReviewScore(productID);
+                System.out.println("The average score for this product is: " + result + " stars");
+                isSuccessful = true;
+            } catch (SQLException e) {
+                e.getMessage();
+            } catch (NumberFormatException e) {
+                System.out.println("Enter an integer please");
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    public static void createReview() throws ClassNotFoundException {
+        boolean isSuccessful = false;
+        while (!isSuccessful) {
+            try {
+                System.out
+                        .println("Enter the params in the respective order: productID, customerID, star, description");
+                int productID = Integer.parseInt(scan.nextLine());
+                int customerID = Integer.parseInt(scan.nextLine());
+                int star = Integer.parseInt(scan.nextLine());
+                String description = scan.nextLine();
+
+                Review newReview = new Review(productID, customerID, star, description, conn);
+
+                services.createReview(newReview);
+                System.out.println("New order review created!");
+                isSuccessful = true;
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (NumberFormatException e) {
+                // System.out.println("Enter an integer please");
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

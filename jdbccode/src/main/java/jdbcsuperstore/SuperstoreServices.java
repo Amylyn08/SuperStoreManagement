@@ -292,6 +292,7 @@ public class SuperstoreServices {
         isProductIDValid(productID);
         String gettingAvg = "{? = call calculateAvgReviewScore(?)}";
         CallableStatement stmt = conn.prepareCall(gettingAvg);
+        stmt.registerOutParameter(1, Types.INTEGER);
         stmt.setInt(2, productID);
         stmt.execute();
         double avgScore = stmt.getDouble(1);
@@ -309,6 +310,7 @@ public class SuperstoreServices {
         isProductIDValid(productID);
         String sql = "{? = call numOrders(?)}";
         CallableStatement stmt = conn.prepareCall(sql);
+        stmt.registerOutParameter(1, Types.INTEGER);
         stmt.setInt(2, productID);
         stmt.execute();
         int num = stmt.getInt(1);
