@@ -19,7 +19,7 @@ public class App
         try {
             services = new SuperstoreServices("jdbc:oracle:thin:", "198.168.52.211", "1521", user, password);
             conn = services.getConnection();
-            placeOrder();
+            conn.close();
 
         }
         catch(NullPointerException e)
