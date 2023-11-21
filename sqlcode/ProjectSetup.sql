@@ -669,9 +669,9 @@ END;
 /
 --TESTING AREA
 DECLARE
-    username Loglogins.username%TYPE := 'josn';
+
 BEGIN
-    logUserLogin(username);
+    dbms_output.put_line(getCustomerIDs(17));
 
 EXCEPTION
     WHEN OTHERS THEN 
@@ -683,63 +683,61 @@ END;
 /****/
 
 /** getting table IDs **/
-CREATE OR REPLACE TYPE array_ids IS TABLE OF NUMBER(2);
-/
+
 
 /** this function will return a list containing all valid product IDs **/
-CREATE OR REPLACE FUNCTION getProductIDs
-RETURN array_ids
-AS
-    prod_ids array_ids;
-BEGIN
-    SELECT
-        productID BULK COLLECT INTO prod_ids
-    FROM
-        Products;
-    RETURN prod_ids;
+CREATE OR REPLACE FUNCTION getProductIDs (fProductID Products.productid%TYPE)RETURN NUMBER
+    AS
+        idCounts    NUMBER(2) := 0;
+    BEGIN
+        SELECT COUNT(productid) INTO idCounts 
+            FROM Products
+            WHERE productid = fProductID;
+        
+        IF (idCounts > 0) THEN 
+            RETURN 1;
+        ELSE 
+            RETURN 0;
+        END IF;
+        
+    EXCEPTION
+        WHEN OTHERS THEN 
+            dbms_output.put_line('something went wrong');
+            RAISE;
 END;
 /
 
 /** this function will return a list containing all valid customer IDs **/
-CREATE OR REPLACE FUNCTION getCustomerIDs
-RETURN array_ids
+CREATE OR REPLACE FUNCTION getCustomerIDs (fCustomerID Customers.customerid%TYPE) RETURN NUMBER
 AS
-    cus_ids array_ids;
+    idCounts    NUMBER(2) := 0;
 BEGIN
-    SELECT
-        customerID BULK COLLECT INTO cus_ids
-    FROM
-        Customers;
+    SELECT COUNT(customerid) INTO idCounts
+        FROM Customers
+        WHERE customerid = fCustomerID;
+
+        IF (idCounts > 0) THEN 
+            RETURN 1;
+        ELSE 
+            RETURN 0;
+        END IF;
         
-    RETURN cus_ids;
+    EXCEPTION
+        WHEN OTHERS THEN 
+            dbms_output.put_line('something went wrong');
+            RAISE;
 END;
 /
 
-/** this function will return a list containing all valid warehouse IDs **/
-CREATE OR REPLACE FUNCTION getWarehouseIDs
-RETURN array_ids
-AS
-    warehouse_ids array_ids;
-BEGIN
-    SELECT
-        warehouseID BULK COLLECT INTO warehouse_ids
-    FROM
-        Warehouses;
-    RETURN warehouse_ids;
-END;
-/
 
-/** this function will return a list containing all valid store IDs **/
-CREATE OR REPLACE FUNCTION getStoreIDs
-RETURN array_ids
-AS
-    store_ids array_ids;
-BEGIN
-    SELECT
-        storeID BULK COLLECT INTO store_ids
-    FROM
-        Stores;
-    RETURN store_ids;
-END;
+
+
+
+
+
+
+
+
+
 /
 

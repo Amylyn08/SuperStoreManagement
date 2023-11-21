@@ -1,4 +1,5 @@
 package jdbcsuperstore;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -49,86 +50,100 @@ public class SuperstoreServices {
     /* CHECK VALIDITY OF IDs */
 
     /**
-     * this function receives a productID as input and checks if that productID is in the db
+     * this function receives a productID as input and checks if that productID is
+     * in the db
+     * 
      * @param productID - represents the productID
      * @throws SQLException
      */
     public void isProductIDValid(int productID) throws SQLException {
-        String orderProc = "{ ? = call getProductIDs()}";
-        CallableStatement stmt = conn.prepareCall(orderProc);
-        stmt.registerOutParameter(1, Types.ARRAY, "ARRAY_IDS");
+        String sql = "{ ? = call getProductIDs(?)}";
+        CallableStatement stmt = conn.prepareCall(sql);
+        stmt.registerOutParameter(1, Types.INTEGER);
+        stmt.setInt(2, productID);
         stmt.execute();
-        Array productIDs = stmt.getArray(1);
-        BigDecimal[] resultArray = (BigDecimal[]) productIDs.getArray();
-        List<Integer> results = new ArrayList<Integer>();
-        for (BigDecimal id : resultArray) {
-            results.add(id.intValue());
-        }
-        if (!results.contains(productID)) {
+
+        int result = stmt.getInt(1);
+
+        if (result == 0) {
             throw new IllegalArgumentException("invalid productID");
         }
     }
 
     /**
-     * this function receives a customerID as input and checks if that customerID is in the db
+     * this function receives a customerID as input and checks if that customerID is
+     * in the db
+     * 
      * @param customerID - represents the customerID
      * @throws SQLException
      */
     public void isCustomerIDValid(int customerID) throws SQLException {
-        String orderProc = "{ ? = call getCustomerIDs()}";
-        CallableStatement stmt = conn.prepareCall(orderProc);
-        stmt.registerOutParameter(1, Types.ARRAY, "ARRAY_IDS");
+        String sql = "{ ? = call getCustomerIDs(?)}";
+        CallableStatement stmt = conn.prepareCall(sql);
+        stmt.registerOutParameter(1, Types.INTEGER);
+        stmt.setInt(2, customerID);
         stmt.execute();
-        Array customerIDs = stmt.getArray(1);
-        BigDecimal[] resultArray = (BigDecimal[]) customerIDs.getArray();
-        List<Integer> results = new ArrayList<Integer>();
-        for (BigDecimal id : resultArray) {
-            results.add(id.intValue());
-        }
-        if (!results.contains(customerID)) {
-            throw new IllegalArgumentException("invalid customerID");
+
+        int result = stmt.getInt(1);
+
+        if (result == 0) {
+            throw new IllegalArgumentException("invalid customer ID");
         }
     }
 
     /**
-     * this function receives a warehouseID as input and checks if that warehouseID is in the db
+     * this function receives a warehouseID as input and checks if that warehouseID
+     * is in the db
+     * 
      * @param warehouseID - represents the warehouseID
      * @throws SQLException
      */
     public void isWarehouseIDValid(int warehouseID) throws SQLException {
-        String orderProc = "{ ? = call getWarehouseIDs()}";
-        CallableStatement stmt = conn.prepareCall(orderProc);
-        stmt.registerOutParameter(1, Types.ARRAY, "ARRAY_IDS");
+        String sql = "{ ? = call getWarehouseIDs(?)}";
+        CallableStatement stmt = conn.prepareCall(sql);
+        stmt.registerOutParameter(1, Types.INTEGER);
+        stmt.setInt(2, warehouseID);
         stmt.execute();
-        Array warehouseIDs = stmt.getArray(1);
-        BigDecimal[] resultArray = (BigDecimal[]) warehouseIDs.getArray();
-        List<Integer> results = new ArrayList<Integer>();
-        for (BigDecimal id : resultArray) {
-            results.add(id.intValue());
-        }
-        if (!results.contains(warehouseID)) {
-            throw new IllegalArgumentException("invalid warehouseID");
+
+        int result = stmt.getInt(1);
+
+        if (result == 0) {
+            throw new IllegalArgumentException("invalid warehouse ID");
         }
     }
 
     /**
-     * this function receives a storeID as input and checks if that storeID is in the db
+     * this function receives a storeID as input and checks if that storeID is in
+     * the db
+     * 
      * @param storeID - represents the storeID
      * @throws SQLException
      */
     public void isStoreIDValid(int storeID) throws SQLException {
-        String orderProc = "{ ? = call getStoreIDs()}";
-        CallableStatement stmt = conn.prepareCall(orderProc);
-        stmt.registerOutParameter(1, Types.ARRAY, "ARRAY_IDS");
+        String sql = "{ ? = call getStoreIDs(?)}";
+        CallableStatement stmt = conn.prepareCall(sql);
+        stmt.registerOutParameter(1, Types.INTEGER);
+        stmt.setInt(2, storeID);
         stmt.execute();
-        Array storeIDs = stmt.getArray(1);
-        BigDecimal[] resultArray = (BigDecimal[]) storeIDs.getArray();
-        List<Integer> results = new ArrayList<Integer>();
-        for (BigDecimal id : resultArray) {
-            results.add(id.intValue());
+
+        int result = stmt.getInt(1);
+
+        if (result == 0) {
+            throw new IllegalArgumentException("invalid store ID");
         }
-        if (!results.contains(storeID)) {
-            throw new IllegalArgumentException("invalid storeID");
+    }
+
+    public void isReviewIDValid(int reviewID) throws SQLException {
+        String sql = "{ ? = call getReviewIDs(?)}";
+        CallableStatement stmt = conn.prepareCall(sql);
+        stmt.registerOutParameter(1, Types.INTEGER);
+        stmt.setInt(2, reviewID);
+        stmt.execute();
+
+        int result = stmt.getInt(1);
+
+        if (result == 0) {
+            throw new IllegalArgumentException("invalid review ID");
         }
     }
 
@@ -139,6 +154,7 @@ public class SuperstoreServices {
     /**
      * this function takes an Order object as input and creates a new order in the
      * DB
+     * 
      * @param orderObj - represents the order object
      * @return - int representing the new OrderID
      * @throws SQLException
@@ -154,16 +170,19 @@ public class SuperstoreServices {
     }
 
     /**
-     * this function takes the parameters necessary in order to add an order item using the addOrderItem procedure
-     * @param newOrderId - represents the orderID of the order that has just been created
-     * @param productID - represents the product to add to that order
-     * @param quantity - represents the quantity of the product they would like to add
+     * this function takes the parameters necessary in order to add an order item
+     * using the addOrderItem procedure
+     * 
+     * @param newOrderId - represents the orderID of the order that has just been
+     *                   created
+     * @param productID  - represents the product to add to that order
+     * @param quantity   - represents the quantity of the product they would like to
+     *                   add
      * @throws SQLException
      */
     public void addOrderItem(int newOrderId, int productID, int quantity) throws SQLException {
         isProductIDValid(productID);
-        if (totalInventory(productID) < quantity)
-        {
+        if (totalInventory(productID) < quantity) {
             throw new IllegalArgumentException("product does not have enough stock");
         }
         String addItem = "{call addOrderItem(?, ?, ?)}";
@@ -176,29 +195,30 @@ public class SuperstoreServices {
 
     /**
      * this function returns the total inventory of a product with a particular ID
+     * 
      * @param productID - represents the product whose inventory we are checking
      * @return - returns the total inventory
      * @throws SQLException
      */
-    public int totalInventory(int productID) throws SQLException
-    {
+    public int totalInventory(int productID) throws SQLException {
         isProductIDValid(productID);
         String inventoryProc = "{? = call totalInventory(?)}";
         CallableStatement stmt = conn.prepareCall(inventoryProc);
         stmt.registerOutParameter(1, Types.INTEGER);
-        stmt.setInt(2, Types.INTEGER);
+        stmt.setInt(2, productID);
         stmt.execute();
         int total = stmt.getInt(1);
-        return(total);
+        return (total);
     }
 
     /**
-     * this function will retrieve a list of all the customers whose comments have been flagged at least once
+     * this function will retrieve a list of all the customers whose comments have
+     * been flagged at least once
+     * 
      * @return - returns a list of customer names
      * @throws SQLException
      */
-    public List<String> flaggedCustomers() throws SQLException
-    {
+    public List<String> flaggedCustomers() throws SQLException {
         List<String> customers = new ArrayList<String>();
         String flaggedCusProc = "{ ? = call calculations.flaggedCustomers()}";
         CallableStatement stmt = conn.prepareCall(flaggedCusProc);
@@ -214,7 +234,8 @@ public class SuperstoreServices {
     }
 
     /**
-     * this function takes a productID and and removes that product from the table 
+     * this function takes a productID and and removes that product from the table
+     * 
      * @param productID
      * @throws SQLException
      */
@@ -230,26 +251,30 @@ public class SuperstoreServices {
 
     /********** AMY *********/
     /**
-     * This  method creates and inserts the review into the DB
-     * @param productID - represents the productID that holds the review
-     * @param customerID - represents the customer that is making the review
-     * @param star  -represents the star rating.
+     * This method creates and inserts the review into the DB
+     * 
+     * @param productID   - represents the productID that holds the review
+     * @param customerID  - represents the customer that is making the review
+     * @param star        -represents the star rating.
      * @param description - represents the description of the rating.
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public void createReview(Review review)throws SQLException{
+    public void createReview(Review review) throws SQLException {
         String createReview = "{call createReview(?)}";
         CallableStatement stmt = conn.prepareCall(createReview);
         stmt.setObject(1, review);
         stmt.execute();
     }
+
     /**
      * This method flags a review in the databse
+     * 
      * @param reviewID
      * @throws SQLException
      */
-    public void flagReview(int reviewID) throws SQLException{
+    public void flagReview(int reviewID) throws SQLException {
+        isReviewIDValid(reviewID);
         String flagReview = "{call flagReview(?)}";
         CallableStatement stmt = conn.prepareCall(flagReview);
         stmt.setInt(1, reviewID);
@@ -258,11 +283,13 @@ public class SuperstoreServices {
 
     /**
      * This function gets the average review score for a product
+     * 
      * @param productID - the victim.
      * @return - returns back the average review score.
      * @throws SQLException
      */
-    public double calculateAvgReviewScore(int productID) throws SQLException{
+    public double calculateAvgReviewScore(int productID) throws SQLException {
+        isProductIDValid(productID);
         String gettingAvg = "{? = call calculateAvgReviewScore(?)}";
         CallableStatement stmt = conn.prepareCall(gettingAvg);
         stmt.setInt(2, productID);
@@ -270,13 +297,16 @@ public class SuperstoreServices {
         double avgScore = stmt.getDouble(1);
         return avgScore;
     }
+
     /**
-     * This function 
+     * This function
+     * 
      * @param productID
      * @return
      * @throws SQLException
      */
-    public int numOrders(int productID) throws SQLException{
+    public int numOrders(int productID) throws SQLException {
+        isProductIDValid(productID);
         String sql = "{? = call numOrders(?)}";
         CallableStatement stmt = conn.prepareCall(sql);
         stmt.setInt(2, productID);
@@ -284,18 +314,20 @@ public class SuperstoreServices {
         int num = stmt.getInt(1);
         return num;
     }
+
     /**
-     * This function 
+     * This function
+     * 
      * @param warehouseID
      * @throws SQLException
      */
-    public void removeWarehouse(int warehouseID) throws SQLException{
+    public void removeWarehouse(int warehouseID) throws SQLException {
+        isWarehouseIDValid(warehouseID);
         String sql = "{call removeWarehouse(?)}";
         CallableStatement stmt = conn.prepareCall(sql);
         stmt.setInt(1, warehouseID);
         stmt.execute();
     }
-
 
     /*******************/
 
