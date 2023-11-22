@@ -145,7 +145,6 @@ public class SuperstoreServices {
      * @return - represents the list of customers
      * @throws SQLException
      */
-
      public List<Customer> viewCustomers() throws SQLException
      {
         CallableStatement cs = this.conn.prepareCall("{call viewPackage.viewCustomers(?)}");
@@ -166,6 +165,34 @@ public class SuperstoreServices {
                  ));
         }
         return customers;
+
+     }
+
+     /**
+     * this function will call the viewCustomer procedure and loop through the cursor to print out info
+     * for all current customers in our table.
+     * @return - represents the list of customers
+     * @throws SQLException
+     */
+     public List<Review> viewReviews() throws SQLException
+     {
+        CallableStatement cs = this.conn.prepareCall("{call viewPackage.viewReviews(?)}");
+        cs.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
+        cs.execute();
+        ResultSet rs = (ResultSet)cs.getObject(1);
+        List<Review> reviews = new ArrayList<Review>();
+        while(rs.next())
+        {
+            reviews.add(new Review(
+                rs.getInt("REVIEWID"),
+                rs.getInt("PRODUCTID"),
+                rs.getInt("CUSTOMERID"),
+                rs.getDouble("STAR"),
+                rs.getInt("FLAGNUMS"),
+                rs.getString("DESCRIPTION")
+                 ));
+        }
+        return reviews;
 
      }
 
@@ -203,6 +230,29 @@ public class SuperstoreServices {
         CallableStatement stmt = conn.prepareCall(addItem);
         stmt.setInt(1, newOrderId);
         stmt.setInt(2, productID);
+        stmt.setInt(3, quantity);
+        stmt.execute();
+    }
+
+    /**
+     * this function takes all parameters necessary to call the newDeliveryIncome, which lets employers log in a new
+     * delivery and update the quantity in a particular warehouse
+     * @param productID - represents the id of the product in the delivery
+     * @param warehouseID - represents the id of the warehouse the delivery is going to
+     * @param quantity - represents the quantity in the delivery
+     * @throws SQLException
+     */
+    public void newDeliveryIncome(int productID, int warehouseID, int quantity) throws SQLException {
+        isProductIDValid(productID);
+        isWarehouseIDValid(warehouseID);
+        if (quantity < 0)
+        {
+            throw new IllegalArgumentException("Quantities cannot be negative");
+        }
+        String addDelivery = "{call newDeliveryIncome(?, ?, ?)}";
+        CallableStatement stmt = conn.prepareCall(addDelivery);
+        stmt.setInt(1, productID);
+        stmt.setInt(2, warehouseID);
         stmt.setInt(3, quantity);
         stmt.execute();
     }
