@@ -1,7 +1,11 @@
 package jdbcsuperstore;
 
+import java.beans.Statement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
+import java.sql.ResultSet;
 import java.util.*;
 
 /**
@@ -21,7 +25,7 @@ public class App {
             conn = services.getConnection();
             // placeOrder();
             // System.out.println(services.totalInventory(20));
-            createReview();
+            removeWarehouse();
 
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -201,14 +205,85 @@ public class App {
                 System.out.println("New order review created!");
                 isSuccessful = true;
             } catch (SQLException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             } catch (NumberFormatException e) {
-                // System.out.println("Enter an integer please");
-                e.printStackTrace();
+                System.out.println("Enter an integer please");
             } catch (IllegalArgumentException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
         }
     }
 
+    public static void flagReview() {
+        boolean isSuccessful = false;
+        while (!isSuccessful) {
+            try {
+                System.out.println("Please enter the review ID that you would like to flag.");
+                int reviewID = Integer.parseInt(scan.nextLine());
+                services.flagReview(reviewID);
+                System.out.println("Review was successfully flagged. Thank you");
+                isSuccessful = true;
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            } catch (NumberFormatException e) {
+                System.out.println("Enter an integer please");
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    public static void viewProductsByCategory() {
+        PreparedStatement stmt = null;
+        boolean loadedProperList = false;
+        while (!loadedProperList) {
+            try {
+                System.out.println(
+                        "Enter the category in which products you would like to view (CASE SENSITIVE):");
+                String category = scan.nextLine();
+                String sqlQuery = "SELECT * FROM Products WHERE category = ?";
+
+                stmt = conn.prepareStatement(sqlQuery);
+                stmt.setString(1, category);
+                ResultSet rs = stmt.executeQuery();
+                List<Product> listOfProducts = new ArrayList<Product>();
+                while (rs.next()) {
+                    listOfProducts
+                            .add(new Product(rs.getInt("productID"), rs.getString("name"), rs.getString("category")));
+                }
+                for (Product p : listOfProducts) {
+                    System.out.println(p);
+                }
+                if (listOfProducts.size() > 0) {
+                    loadedProperList = true;
+                } else {
+                    System.out.println("There was no products with this specific category. Try again!:");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    public static void removeWarehouse() {
+        boolean isSuccessful = false;
+        while (!isSuccessful) {
+            try {
+                System.out.println("Enter the warehouseID you would like to delete:");
+                int warehouseID = Integer.parseInt(scan.nextLine());
+                services.removeWarehouse(warehouseID);
+                System.out.println("Warehouse deleted successfully.");
+                isSuccessful = true;
+            } catch (SQLException e) {
+                e.getMessage();
+            } catch (NumberFormatException e) {
+                System.out.println("Enter an integer please");
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+
+        }
+    }
 }
