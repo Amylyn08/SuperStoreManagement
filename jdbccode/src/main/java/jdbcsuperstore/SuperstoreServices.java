@@ -3,10 +3,15 @@ package jdbcsuperstore;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.Struct;
+
+import javax.naming.spi.DirStateFactory.Result;
+
 import java.math.BigDecimal;
 import java.sql.Array;
 
@@ -331,6 +336,46 @@ public class SuperstoreServices {
         stmt.execute();
     }
 
+    public List<Product> getListofProducts() throws SQLException {
+        List<Product> productList = new ArrayList<Product>();
+        CallableStatement stmt = conn.prepareCall("{? = call getproducts}");
+        stmt.registerOutParameter(1, Types.ARRAY, "PRODUCTS_COLLECTION");
+        stmt.execute();
+
+        Array array = stmt.getArray(1);
+        Object[] structArray = (Object[]) array.getArray();
+
+        // Convert the array of STRUCT objects to a List of Product objects
+        for (Object structObject : structArray) {
+            Struct struct = (Struct) structObject;
+
+            Object[] attributes = struct.getAttributes();
+            int productID = ((BigDecimal) attributes[0]).intValue();
+            String name = (String) attributes[1];
+            String category = (String) attributes[2];
+
+            Product product = new Product(productID, name, category);
+            productList.add(product);
+        }
+        return productList;
+    }
+
+    public void addCustomer(Review review) throws SQLException {
+        String createReview = "{call createReview(?)}";
+        CallableStatement stmt = conn.prepareCall(createReview);
+        stmt.setObject(1, review);
+        stmt.execute();
+    }
+
     /*******************/
 
 }
+
+// Array arr = stmt.getArray(1);
+// ResultSet rs = arr.getResultSet();
+// while (rs.next()) {
+// int productID = rs.getInt(1);
+// String name = rs.getString(2);
+// String category = rs.getString(3);
+// Product prod = new Product(productID, name, category);
+// productList.add(prod);

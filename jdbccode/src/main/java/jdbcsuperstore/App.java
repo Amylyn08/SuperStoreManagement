@@ -25,7 +25,7 @@ public class App {
             conn = services.getConnection();
             // placeOrder();
             // System.out.println(services.totalInventory(20));
-            removeWarehouse();
+            showProducts();
 
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -285,5 +285,16 @@ public class App {
             }
 
         }
+    }
+
+    public static void showProducts() throws SQLException {
+        List<Product> listProducts = services.getListofProducts();
+        for (Product prod : listProducts) {
+            System.out.println(prod);
+        }
+    }
+
+    public static void addCustomer() throws SQLException {
+
     }
 }
