@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.Struct;
@@ -155,6 +156,36 @@ public class SuperstoreServices {
     // functions and procedures here:
 
     /********** BIANCA *********/
+
+    /**
+     * this function will call the viewCustomer procedure and loop through the cursor to print out info
+     * for all current customers in our table.
+     * @return - represents the list of customers
+     * @throws SQLException
+     */
+
+     public List<Customer> viewCustomers() throws SQLException
+     {
+        CallableStatement cs = this.conn.prepareCall("{call viewPackage.viewCustomers(?)}");
+        cs.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
+        cs.execute();
+        ResultSet rs = (ResultSet)cs.getObject(1);
+        List<Customer> customers = new ArrayList<Customer>();
+        while(rs.next())
+        {
+            customers.add(new Customer(
+                rs.getString("firstName"),
+                rs.getString("lastName"),
+                rs.getString("email"),
+                rs.getString("streetAddress"),
+                rs.getString("city"),
+                rs.getString("province"),
+                rs.getString("country")
+                 ));
+        }
+        return customers;
+
+     }
 
     /**
      * this function takes an Order object as input and creates a new order in the

@@ -510,7 +510,28 @@ BEGIN
 END;
 /
 
+/******** VIEW PACKAGE BEGINS HERE *********/
+CREATE OR REPLACE PACKAGE viewPackage AS
+    TYPE cursor_table IS REF CURSOR; -- this type can be used for all your proceudes, no need to redeclare!
+    /** BIANCA **/
+    PROCEDURE viewCustomers(cursor_c IN OUT cursor_table);
+    /** AMY **/
+END viewPackage;
+/
 
+CREATE OR REPLACE PACKAGE BODY viewPackage
+AS
+    /** BIANCA **/
+    PROCEDURE viewCustomers(cursor_c IN OUT cursor_table)
+    AS
+    BEGIN
+        OPEN cursor_c FOR
+            SELECT * FROM Customers;
+    END;
+    /** AMY **/
+    
+END viewPackage;
+/
 /****/
 
 

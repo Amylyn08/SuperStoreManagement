@@ -23,9 +23,8 @@ public class App {
         try {
             services = new SuperstoreServices("jdbc:oracle:thin:", "198.168.52.211", "1521", user, password);
             conn = services.getConnection();
-            // placeOrder();
-            // System.out.println(services.totalInventory(20));
-            showProducts();
+            viewCustomerInfo();
+            conn.close();
 
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -114,6 +113,18 @@ public class App {
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
             }
+        }
+    }
+
+    public static void viewCustomerInfo() {
+        List<Customer> customers = null;
+        try {
+            customers = services.viewCustomers();
+            for (Customer c : customers) {
+                System.out.println(c);
+            }
+        } catch (SQLException e) {
+            e.getMessage();
         }
     }
 
