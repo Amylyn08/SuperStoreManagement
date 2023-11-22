@@ -19,6 +19,7 @@ public class App
         try {
             services = new SuperstoreServices("jdbc:oracle:thin:", "198.168.52.211", "1521", user, password);
             conn = services.getConnection();
+            viewCustomerInfo();
             conn.close();
 
         }
@@ -136,6 +137,23 @@ public class App
             {
                 System.out.println(e.getMessage());
             }
+        }
+    }
+
+     public static void viewCustomerInfo()
+    {
+        List<Customer> customers = null;
+        try 
+        {
+            customers = services.viewCustomers();
+            for (Customer c : customers)
+            {
+                System.out.println(c);
+            }
+        }
+        catch (SQLException e)
+        {
+            e.getMessage();
         }
     }
 
