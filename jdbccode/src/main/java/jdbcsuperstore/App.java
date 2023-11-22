@@ -23,7 +23,8 @@ public class App {
         try {
             services = new SuperstoreServices("jdbc:oracle:thin:", "198.168.52.211", "1521", user, password);
             conn = services.getConnection();
-            viewCustomerInfo();
+            // viewCustomerInfo();
+            addCustomer();
             conn.close();
 
         } catch (NullPointerException e) {
@@ -306,6 +307,34 @@ public class App {
     }
 
     public static void addCustomer() throws SQLException {
+        boolean isSuccessful = false;
+        while (!isSuccessful) {
+            try {
+                System.out.println("Please enter the following values for the new customer: ");
+                System.out.println("firstname");
+                String firstname = scan.nextLine();
+                System.out.println("lastname:");
+                String lastname = scan.nextLine();
+                System.out.println("email");
+                String email = scan.nextLine();
+                System.out.println("streetAddress:");
+                String address = scan.nextLine();
+                System.out.println("city:");
+                String city = scan.nextLine();
+                System.out.println("province:");
+                String province = scan.nextLine();
+                System.out.println("country");
+                String country = scan.nextLine();
 
+                Customer newCus = new Customer(firstname, lastname, email, address, city, province, country);
+                services.addCustomer(newCus);
+                System.out.println("Customer added succesffuly!");
+                isSuccessful = true;
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

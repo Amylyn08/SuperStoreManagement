@@ -1,6 +1,8 @@
 package jdbcsuperstore;
 
-public class Customer {
+import java.sql.*;
+
+public class Customer implements SQLData {
     private String firstName;
     private String lastName;
     private String email;
@@ -18,6 +20,8 @@ public class Customer {
         this.city = city;
         this.province = province;
         this.country = country;
+
+        Map map = 
     }
 
     public String toString() {
