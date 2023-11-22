@@ -516,6 +516,7 @@ CREATE OR REPLACE PACKAGE viewPackage AS
     /** BIANCA **/
     PROCEDURE viewCustomers(cursor_c IN OUT cursor_table);
     /** AMY **/
+    
 END viewPackage;
 /
 
@@ -859,6 +860,30 @@ CREATE OR REPLACE FUNCTION getAllOrders RETURN orders_collection
             dbms_output.put_line('something went wrong');
         RAISE;
 END;
+/
+CREATE OR REPLACE TYPE customer_type AS OBJECT(
+    firstname   VARCHAR2(40),
+    lastname    VARCHAR2(20),
+    email       VARCHAR2(30),
+    streetAddress   VARCHAR2(40),
+    city            VARCHAR2(40),
+    province        VARCHAR2(40),
+    country         VARCHAR2(40)
+    );
+/
+
+CREATE OR REPLACE PROCEDURE addCustomer(customer IN customer_type)
+    AS  
+    
+    BEGIN
+    INSERT INTO Customers(firstname, lastname, email, streetAddress, city, province, country)
+        VALUES (customer.firstname, customer.lastname, customer.email, customer.streetAddress, customer.city, customer.province, customer.country);
+    EXCEPTION
+        WHEN OTHERS THEN 
+            dbms_output.put_line('something went wrong');
+            RAISE;
+    END;
+
 /
 DECLARE
     v_result orders_collection;
