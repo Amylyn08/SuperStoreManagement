@@ -83,7 +83,7 @@ CREATE TABLE Reviews(
     reviewID        NUMBER(2)   GENERATED ALWAYS AS IDENTITY CONSTRAINT reviews_pk PRIMARY KEY,
     productID       NUMBER(2)   REFERENCES Products(productID) ON DELETE CASCADE NOT NULL,
 	customerID  	NUMBER(2) 	REFERENCES Customers(customerID) ON DELETE CASCADE NOT NULL,
-    star            NUMBER(1),
+    star            NUMBER(2, 1),
     flagNums        NUMBER(1),
     description     VARCHAR2(100)
 );
@@ -520,6 +520,8 @@ CREATE OR REPLACE PACKAGE viewPackage AS
     TYPE cursor_table IS REF CURSOR; -- this type can be used for all your proceudes, no need to redeclare!
     /** BIANCA **/
     PROCEDURE viewCustomers(cursor_c IN OUT cursor_table);
+    PROCEDURE viewReviews(cursor_c IN OUT cursor_table);
+    PROCEDURE viewWarehouses(cursor_c IN OUT cursor_table);
     /** AMY **/
     PROCEDURE viewProducts (cursor_view IN OUT cursor_table);
     PROCEDURE viewOrders (cursor_view IN OUT cursor_table);
@@ -537,6 +539,20 @@ AS
     BEGIN
         OPEN cursor_c FOR
             SELECT * FROM Customers;
+    END;
+    
+    PROCEDURE viewWarehouses(cursor_c IN OUT cursor_table)
+    AS
+    BEGIN
+        OPEN cursor_c FOR
+            SELECT * FROM Warehouses;
+    END;
+    
+    PROCEDURE viewReviews(cursor_c IN OUT cursor_table)
+    AS
+    BEGIN
+        OPEN cursor_c FOR
+            SELECT * FROM Reviews;
     END;
     /** AMY **/
     
@@ -569,6 +585,31 @@ AS
     END;
 END viewPackage;
 /
+-- prodID, warehouseID, quantity update Warehouse_products
+CREATE OR REPLACE PROCEDURE newDeliveryIncome(
+newProductID IN Products.productID%TYPE,
+newWarehouseID IN Warehouses.warehouseID%TYPE,
+newQuantity IN Warehouses_Products.quantity%TYPE)
+AS
+    oldQuantity NUMBER;
+BEGIN
+    SELECT
+        quantity INTO oldQuantity
+    FROM
+        Warehouses_Products
+    WHERE
+        productID = newProductID
+        AND warehouseID = newWarehouseID;
+    oldQuantity := oldQuantity + newQuantity;
+    UPDATE Warehouses_Products SET quantity = oldQuantity 
+    WHERE productID = newProductID AND warehouseID = newWarehouseID;
+EXCEPTION
+    WHEN OTHERS THEN
+        dbms_output.put_line('something went wrong');
+END;
+/
+
+
 /****/
 
 
@@ -715,21 +756,7 @@ BEGIN
             VALUES(:NEW.warehouseid, :NEW.productid, :NEW.quantity, CURRENT_DATE, 'INSERTED');
     END IF;
 END;
-
 /
---TESTING AREA
-DECLARE
-
-BEGIN
-    dbms_output.put_line(getCustomerIDs(20));
-
-EXCEPTION
-    WHEN OTHERS THEN 
-        dbms_output.put_line('something went wrong');
-END;
-
-/
-
 /****/
 
 /** getting table IDs **/

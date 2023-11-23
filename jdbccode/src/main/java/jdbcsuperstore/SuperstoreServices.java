@@ -16,7 +16,7 @@ import java.sql.Array;
 public class SuperstoreServices {
     private Connection conn;
 
-    public SuperstoreServices(String driver, String host, String port, String user, String password) {
+    public SuperstoreServices(String driver, String host, String port, String user, String password) throws SQLException {
         createConnection(driver, host, port, user, password);
     }
 
@@ -26,19 +26,15 @@ public class SuperstoreServices {
             this.conn.close();
     }
 
-    public void createConnection(String driver, String host, String port, String user, String password) {
-        try {
-            if (!this.connectionActive()) {
-                this.conn = DriverManager.getConnection(
-                        "jdbc:oracle:thin:@198.168.52.211:1521/pdbora19c.dawsoncollege.qc.ca",
-                        user, password);
-                String logLogin = "{call logUserLogin(?)}";
-                CallableStatement stmt = this.conn.prepareCall(logLogin);
-                stmt.setString(1, user);
-                stmt.execute();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public void createConnection(String driver, String host, String port, String user, String password) throws SQLException {
+        if (!this.connectionActive()) {
+            this.conn = DriverManager.getConnection(
+                    "jdbc:oracle:thin:@198.168.52.211:1521/pdbora19c.dawsoncollege.qc.ca",
+                    user, password);
+            String logLogin = "{call logUserLogin(?)}";
+            CallableStatement stmt = this.conn.prepareCall(logLogin);
+            stmt.setString(1, user);
+            stmt.execute();
         }
     }
 
@@ -163,7 +159,8 @@ public class SuperstoreServices {
      * @throws SQLException
      */
 
-    public List<Customer> viewCustomers() throws SQLException, ClassNotFoundException {
+
+    public List<Customer> viewCustomers() throws SQLException{
         CallableStatement cs = this.conn.prepareCall("{call viewPackage.viewCustomers(?)}");
         cs.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
         cs.execute();
@@ -183,6 +180,62 @@ public class SuperstoreServices {
         return customers;
 
     }
+
+     /**
+     * this function will call the viewCustomer procedure and loop through the cursor to print out info
+     * for all current customers in our table.
+     * @return - represents the list of customers
+     * @throws SQLException
+     */
+     public List<Review> viewReviews() throws SQLException
+     {
+        CallableStatement cs = this.conn.prepareCall("{call viewPackage.viewReviews(?)}");
+        cs.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
+        cs.execute();
+        ResultSet rs = (ResultSet)cs.getObject(1);
+        List<Review> reviews = new ArrayList<Review>();
+        while(rs.next())
+        {
+            reviews.add(new Review(
+                rs.getInt("REVIEWID"),
+                rs.getInt("PRODUCTID"),
+                rs.getInt("CUSTOMERID"),
+                rs.getDouble("STAR"),
+                rs.getInt("FLAGNUMS"),
+                rs.getString("DESCRIPTION")
+                 ));
+        }
+        return reviews;
+
+     }
+
+     /**
+     * this function will call the viewWarehouses procedure and loop through the cursor to print out info
+     * for all current warehouses in our table.
+     * @return - represents the list of customers
+     * @throws SQLException
+     */
+     public List<Warehouse> viewWarehouse() throws SQLException
+     {
+        CallableStatement cs = this.conn.prepareCall("{call viewPackage.viewWarehouses(?)}");
+        cs.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
+        cs.execute();
+        ResultSet rs = (ResultSet)cs.getObject(1);
+        List<Warehouse> warehouses = new ArrayList<Warehouse>();
+        while(rs.next())
+        {
+            warehouses.add(new Warehouse(
+                rs.getInt("warehouseID"),
+                rs.getString("name"),
+                rs.getString("streetAddress"),
+                rs.getString("city"),
+                rs.getString("province"),
+                rs.getString("country")
+                 ));
+        }
+        return warehouses;
+
+     }
 
     /**
      * this function takes an Order object as input and creates a new order in the
@@ -222,6 +275,29 @@ public class SuperstoreServices {
         CallableStatement stmt = conn.prepareCall(addItem);
         stmt.setInt(1, newOrderId);
         stmt.setInt(2, productID);
+        stmt.setInt(3, quantity);
+        stmt.execute();
+    }
+
+    /**
+     * this function takes all parameters necessary to call the newDeliveryIncome, which lets employers log in a new
+     * delivery and update the quantity in a particular warehouse
+     * @param productID - represents the id of the product in the delivery
+     * @param warehouseID - represents the id of the warehouse the delivery is going to
+     * @param quantity - represents the quantity in the delivery
+     * @throws SQLException
+     */
+    public void newDeliveryIncome(int productID, int warehouseID, int quantity) throws SQLException {
+        isProductIDValid(productID);
+        isWarehouseIDValid(warehouseID);
+        if (quantity < 0)
+        {
+            throw new IllegalArgumentException("Quantities cannot be negative");
+        }
+        String addDelivery = "{call newDeliveryIncome(?, ?, ?)}";
+        CallableStatement stmt = conn.prepareCall(addDelivery);
+        stmt.setInt(1, productID);
+        stmt.setInt(2, warehouseID);
         stmt.setInt(3, quantity);
         stmt.execute();
     }
@@ -379,6 +455,7 @@ public class SuperstoreServices {
         List<Order> listOrders = new ArrayList<Order>();
         while (rs.next()) {
             listOrders.add(new Order(
+                    rs.getInt("orderID"),
                     rs.getInt("customerID"),
                     rs.getInt("storeID"),
                     rs.getDate("orderDate")));

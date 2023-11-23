@@ -4,9 +4,10 @@ import java.sql.*;
 import java.util.*;
 
 public class Review implements SQLData {
+    private int reviewID;
     private int productID;
     private int customerID;
-    private int star;
+    private double star;
     private int flagnums;
     private String description;
     private String sql_type = "REVIEW_TYPE";
@@ -28,11 +29,20 @@ public class Review implements SQLData {
         map.put(this.sql_type, Class.forName("jdbcsuperstore.Review"));
     }
 
+    public Review(int reviewID, int productID, int customerID, double star, int flagnums, String description) {
+        this.reviewID = reviewID;
+        this.productID = productID;
+        this.customerID = customerID;
+        this.star = star;
+        this.flagnums = flagnums;
+        this.description = description;
+    }
+
     @Override
     public void writeSQL(SQLOutput stream) throws SQLException {
         stream.writeInt(this.productID);
         stream.writeInt(this.customerID);
-        stream.writeInt(this.star);
+        stream.writeDouble(this.star);
         stream.writeInt(this.flagnums);
         stream.writeString(this.description);
     }
@@ -41,7 +51,7 @@ public class Review implements SQLData {
     public void readSQL(SQLInput stream, String type) throws SQLException {
         this.productID = stream.readInt();
         this.customerID = stream.readInt();
-        this.star = stream.readInt();
+        this.star = stream.readDouble();
         this.flagnums = stream.readInt();
         this.description = stream.readString();
     }
@@ -49,5 +59,15 @@ public class Review implements SQLData {
     @Override
     public String getSQLTypeName() {
         return this.sql_type;
+    }
+
+    public String toString()
+    {
+        return("Review ID: " + this.reviewID +
+        ", ProductID: " + this.productID +
+        ", CustomerID: " + this.customerID +
+        ", Star Rating: " + this.star +
+        ", Flags: " + this.flagnums + 
+        (this.description != null ? ", Description: " + this.description : ""));
     }
 }
