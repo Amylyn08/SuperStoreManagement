@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.util.*;
 
 public class Order implements SQLData {
+    private int orderID;
     private int customerID;
     private int storeID;
     private java.sql.Date date;
@@ -19,7 +20,8 @@ public class Order implements SQLData {
         map.put(this.sql_type, Class.forName("jdbcsuperstore.Order"));
     }
 
-    public Order(int customerID, int storeID, java.sql.Date date) {
+    public Order(int orderID, int customerID, int storeID, java.sql.Date date) {
+        this.orderID = orderID;
         this.customerID = customerID;
         this.storeID = storeID;
         this.date = date;
@@ -46,7 +48,7 @@ public class Order implements SQLData {
 
     @Override
     public String toString() {
-        return "CustomerID: " + this.customerID + ", storeID: " + this.storeID + ", orderDate: " + this.date;
+        return "OrderID: " + this.orderID + ", CustomerID: " + this.customerID + ", storeID: " + this.storeID + ", orderDate: " + this.date;
     }
 
 }

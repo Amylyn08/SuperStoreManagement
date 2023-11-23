@@ -16,7 +16,7 @@ import java.sql.Array;
 public class SuperstoreServices {
     private Connection conn;
 
-    public SuperstoreServices(String driver, String host, String port, String user, String password) {
+    public SuperstoreServices(String driver, String host, String port, String user, String password) throws SQLException {
         createConnection(driver, host, port, user, password);
     }
 
@@ -26,19 +26,15 @@ public class SuperstoreServices {
             this.conn.close();
     }
 
-    public void createConnection(String driver, String host, String port, String user, String password) {
-        try {
-            if (!this.connectionActive()) {
-                this.conn = DriverManager.getConnection(
-                        "jdbc:oracle:thin:@198.168.52.211:1521/pdbora19c.dawsoncollege.qc.ca",
-                        user, password);
-                String logLogin = "{call logUserLogin(?)}";
-                CallableStatement stmt = this.conn.prepareCall(logLogin);
-                stmt.setString(1, user);
-                stmt.execute();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public void createConnection(String driver, String host, String port, String user, String password) throws SQLException {
+        if (!this.connectionActive()) {
+            this.conn = DriverManager.getConnection(
+                    "jdbc:oracle:thin:@198.168.52.211:1521/pdbora19c.dawsoncollege.qc.ca",
+                    user, password);
+            String logLogin = "{call logUserLogin(?)}";
+            CallableStatement stmt = this.conn.prepareCall(logLogin);
+            stmt.setString(1, user);
+            stmt.execute();
         }
     }
 
@@ -164,7 +160,7 @@ public class SuperstoreServices {
      */
 
 
-    public List<Customer> viewCustomers() throws SQLException, ClassNotFoundException {
+    public List<Customer> viewCustomers() throws SQLException{
         CallableStatement cs = this.conn.prepareCall("{call viewPackage.viewCustomers(?)}");
         cs.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
         cs.execute();
@@ -210,6 +206,34 @@ public class SuperstoreServices {
                  ));
         }
         return reviews;
+
+     }
+
+     /**
+     * this function will call the viewWarehouses procedure and loop through the cursor to print out info
+     * for all current warehouses in our table.
+     * @return - represents the list of customers
+     * @throws SQLException
+     */
+     public List<Warehouse> viewWarehouse() throws SQLException
+     {
+        CallableStatement cs = this.conn.prepareCall("{call viewPackage.viewWarehouses(?)}");
+        cs.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
+        cs.execute();
+        ResultSet rs = (ResultSet)cs.getObject(1);
+        List<Warehouse> warehouses = new ArrayList<Warehouse>();
+        while(rs.next())
+        {
+            warehouses.add(new Warehouse(
+                rs.getInt("warehouseID"),
+                rs.getString("name"),
+                rs.getString("streetAddress"),
+                rs.getString("city"),
+                rs.getString("province"),
+                rs.getString("country")
+                 ));
+        }
+        return warehouses;
 
      }
 
@@ -431,6 +455,7 @@ public class SuperstoreServices {
         List<Order> listOrders = new ArrayList<Order>();
         while (rs.next()) {
             listOrders.add(new Order(
+                    rs.getInt("orderID"),
                     rs.getInt("customerID"),
                     rs.getInt("storeID"),
                     rs.getDate("orderDate")));

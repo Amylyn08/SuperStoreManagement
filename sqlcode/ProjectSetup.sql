@@ -521,6 +521,7 @@ CREATE OR REPLACE PACKAGE viewPackage AS
     /** BIANCA **/
     PROCEDURE viewCustomers(cursor_c IN OUT cursor_table);
     PROCEDURE viewReviews(cursor_c IN OUT cursor_table);
+    PROCEDURE viewWarehouses(cursor_c IN OUT cursor_table);
     /** AMY **/
     PROCEDURE viewProducts (cursor_view IN OUT cursor_table);
     PROCEDURE viewOrders (cursor_view IN OUT cursor_table);
@@ -538,6 +539,13 @@ AS
     BEGIN
         OPEN cursor_c FOR
             SELECT * FROM Customers;
+    END;
+    
+    PROCEDURE viewWarehouses(cursor_c IN OUT cursor_table)
+    AS
+    BEGIN
+        OPEN cursor_c FOR
+            SELECT * FROM Warehouses;
     END;
     
     PROCEDURE viewReviews(cursor_c IN OUT cursor_table)
@@ -748,21 +756,7 @@ BEGIN
             VALUES(:NEW.warehouseid, :NEW.productid, :NEW.quantity, CURRENT_DATE, 'INSERTED');
     END IF;
 END;
-
 /
---TESTING AREA
-DECLARE
-
-BEGIN
-    dbms_output.put_line(getCustomerIDs(20));
-
-EXCEPTION
-    WHEN OTHERS THEN 
-        dbms_output.put_line('something went wrong');
-END;
-
-/
-
 /****/
 
 /** getting table IDs **/
