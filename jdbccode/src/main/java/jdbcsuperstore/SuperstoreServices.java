@@ -8,6 +8,9 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.naming.spi.DirStateFactory.Result;
+
 import java.sql.Array;
 
 public class SuperstoreServices {
@@ -408,6 +411,22 @@ public class SuperstoreServices {
             stores.add(new Store(rs.getInt("storeID"), rs.getString("name")));
         }
         return stores;
+    }
+
+    public List<Product> getProductsByCategory(String categoryName) throws SQLException, ClassNotFoundException {
+        CallableStatement stmt = conn.prepareCall("{call viewPackage.viewProductsByCategory(?,?)}");
+        stmt.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
+        stmt.setString(2, categoryName);
+        stmt.execute();
+        ResultSet rs = (ResultSet) stmt.getObject(1);
+        List<Product> products = new ArrayList<Product>();
+        while (rs.next()) {
+            products.add(new Product(rs.getInt("productID"), rs.getString("name"), rs.getString("category")));
+        }
+        if (products.size() == 0) {
+            throw new IllegalArgumentException("category name does not exist");
+        }
+        return products;
     }
 
 }

@@ -22,7 +22,7 @@ public class App {
             services = new SuperstoreServices("jdbc:oracle:thin:", "198.168.52.211", "1521", user, password);
             conn = services.getConnection();
             // viewCustomerInfo();
-            viewAllStoreInfo();
+            removeWarehouse();
             conn.close();
 
         } catch (NullPointerException e) {
@@ -102,6 +102,7 @@ public class App {
             try {
                 System.out.println("Please enter the productID of the product whose inventory you would like to view:");
                 int productID = Integer.parseInt(scan.nextLine());
+                services.isProductIDValid(productID);
                 int inventory = services.totalInventory(productID);
                 System.out.println("total inventory of product with id " + productID + " is " + inventory);
                 isSuccessful = true;
@@ -147,6 +148,7 @@ public class App {
             try {
                 System.out.println("Please enter the productID of the product you would like to remove:");
                 int productID = Integer.parseInt(scan.nextLine());
+                services.isProductIDValid(productID);
                 services.removeProduct(productID);
                 System.out.println("product has been successfully removed!");
                 isSuccessful = true;
@@ -166,6 +168,7 @@ public class App {
             try {
                 System.out.println("Enter productid to view it's total orders:");
                 int productID = Integer.parseInt(scan.nextLine());
+                services.isProductIDValid(productID);
                 int total = services.numOrders(productID);
                 System.out.println("For productID of " + productID + ", there are " + total + " orders placed");
                 isSuccessful = true;
@@ -185,6 +188,7 @@ public class App {
             try {
                 System.out.println("Enter a productID to view it's average review score:");
                 int productID = Integer.parseInt(scan.nextLine());
+                services.isReviewIDValid(productID);
                 double result = services.calculateAvgReviewScore(productID);
                 System.out.println("The average score for this product is: " + result + " stars");
                 isSuccessful = true;
@@ -230,6 +234,7 @@ public class App {
             try {
                 System.out.println("Please enter the review ID that you would like to flag.");
                 int reviewID = Integer.parseInt(scan.nextLine());
+                services.isReviewIDValid(reviewID);
                 services.flagReview(reviewID);
                 System.out.println("Review was successfully flagged. Thank you");
                 isSuccessful = true;
@@ -244,32 +249,19 @@ public class App {
     }
 
     public static void viewProductsByCategory() {
-        PreparedStatement stmt = null;
-        boolean loadedProperList = false;
-        while (!loadedProperList) {
+        boolean isSuccessful = false;
+        while (!isSuccessful) {
             try {
-                System.out.println(
-                        "Enter the category in which products you would like to view (CASE SENSITIVE):");
+                System.out.println("Enter category name in which products you'd like to view(CASE SENSITVE)");
                 String category = scan.nextLine();
-                String sqlQuery = "SELECT * FROM Products WHERE category = ?";
-
-                stmt = conn.prepareStatement(sqlQuery);
-                stmt.setString(1, category);
-                ResultSet rs = stmt.executeQuery();
-                List<Product> listOfProducts = new ArrayList<Product>();
-                while (rs.next()) {
-                    listOfProducts
-                            .add(new Product(rs.getInt("productID"), rs.getString("name"), rs.getString("category")));
-                }
-                for (Product p : listOfProducts) {
+                List<Product> products = services.getProductsByCategory(category);
+                for (Product p : products) {
                     System.out.println(p);
                 }
-                if (listOfProducts.size() > 0) {
-                    loadedProperList = true;
-                } else {
-                    System.out.println("There was no products with this specific category. Try again!:");
-                }
+                isSuccessful = true;
             } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
@@ -283,6 +275,7 @@ public class App {
             try {
                 System.out.println("Enter the warehouseID you would like to delete:");
                 int warehouseID = Integer.parseInt(scan.nextLine());
+                services.isWarehouseIDValid(warehouseID);
                 services.removeWarehouse(warehouseID);
                 System.out.println("Warehouse deleted successfully.");
                 isSuccessful = true;
@@ -322,7 +315,7 @@ public class App {
                 System.out.println("Customer added succesffuly!");
                 isSuccessful = true;
             } catch (SQLException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
             }

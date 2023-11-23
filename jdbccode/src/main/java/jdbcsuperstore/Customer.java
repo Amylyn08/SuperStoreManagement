@@ -44,7 +44,6 @@ public class Customer implements SQLData {
 
     @Override
     public void writeSQL(SQLOutput stream) throws SQLException {
-        stream.writeInt(this.customerid);
         stream.writeString(this.firstName);
         stream.writeString(this.lastName);
         stream.writeString(this.email);
@@ -56,7 +55,6 @@ public class Customer implements SQLData {
 
     @Override
     public void readSQL(SQLInput stream, String type) throws SQLException {
-        this.customerid = stream.readInt();
         this.firstName = stream.readString();
         this.lastName = stream.readString();
         this.email = stream.readString();

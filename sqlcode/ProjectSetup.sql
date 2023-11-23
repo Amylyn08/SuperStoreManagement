@@ -524,6 +524,7 @@ CREATE OR REPLACE PACKAGE viewPackage AS
     PROCEDURE viewProducts (cursor_view IN OUT cursor_table);
     PROCEDURE viewOrders (cursor_view IN OUT cursor_table);
     PROCEDURE viewStores (cursor_view IN OUT cursor_table);
+    PROCEDURE viewProductsbyCategory (cursor_view IN OUT cursor_table, categoryName VARCHAR2);
     
 END viewPackage;
 /
@@ -558,6 +559,13 @@ AS
     BEGIN 
         OPEN cursor_view FOR
             SELECT * FROM Stores;
+    END;
+    
+    PROCEDURE viewProductsbyCategory (cursor_view IN OUT cursor_table, categoryName VARCHAR2)
+    AS
+    BEGIN
+        OPEN cursor_view FOR
+            SELECT * FROM Products WHERE category = categoryName;
     END;
 END viewPackage;
 /
@@ -850,8 +858,17 @@ CREATE OR REPLACE TYPE customer_type AS OBJECT(
 
 CREATE OR REPLACE PROCEDURE addCustomer(customer IN customer_type)
     AS  
-    
+        customerExists NUMBER(2) :=0;
+        e_customer_exists EXCEPTION;
+        PRAGMA EXCEPTION_INIT (e_customer_exists, -20002);
     BEGIN
+        SELECT COUNT(customerid) INTO customerExists
+            FROM Customers
+            WHERE email = customer.email;
+    IF(customerExists >0) THEN
+        raise_application_error(-20002, 'customer already exists! Aborting..');
+    END IF;
+    
     INSERT INTO Customers(firstname, lastname, email, streetAddress, city, province, country)
         VALUES (customer.firstname, customer.lastname, customer.email, customer.streetAddress, customer.city, customer.province, customer.country);
     EXCEPTION
