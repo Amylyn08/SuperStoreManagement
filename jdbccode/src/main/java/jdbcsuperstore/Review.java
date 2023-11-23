@@ -14,6 +14,10 @@ public class Review implements SQLData {
 
     public Review(int productID, int customerID, int star, String description, Connection conn)
             throws SQLException, ClassNotFoundException {
+
+        if (star < 0.5 || star > 5.0) {
+            throw new IllegalArgumentException("Star needs to be above 0.5 and below 5");
+        }
         this.productID = productID;
         this.customerID = customerID;
         this.star = star;
