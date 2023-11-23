@@ -6,14 +6,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
-import java.sql.Struct;
-
-import javax.naming.spi.DirStateFactory.Result;
-
-import java.math.BigDecimal;
 import java.sql.Array;
 
 public class SuperstoreServices {
@@ -166,7 +160,7 @@ public class SuperstoreServices {
      * @throws SQLException
      */
 
-    public List<Customer> viewCustomers() throws SQLException {
+    public List<Customer> viewCustomers() throws SQLException, ClassNotFoundException {
         CallableStatement cs = this.conn.prepareCall("{call viewPackage.viewCustomers(?)}");
         cs.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
         cs.execute();
@@ -174,6 +168,7 @@ public class SuperstoreServices {
         List<Customer> customers = new ArrayList<Customer>();
         while (rs.next()) {
             customers.add(new Customer(
+                    rs.getInt("customerId"),
                     rs.getString("firstName"),
                     rs.getString("lastName"),
                     rs.getString("email"),
@@ -366,30 +361,6 @@ public class SuperstoreServices {
         stmt.execute();
     }
 
-    public List<Product> getListofProducts() throws SQLException {
-        List<Product> productList = new ArrayList<Product>();
-        CallableStatement stmt = conn.prepareCall("{? = call getproducts}");
-        stmt.registerOutParameter(1, Types.ARRAY, "PRODUCTS_COLLECTION");
-        stmt.execute();
-
-        Array array = stmt.getArray(1);
-        Object[] structArray = (Object[]) array.getArray();
-
-        // Convert the array of STRUCT objects to a List of Product objects
-        for (Object structObject : structArray) {
-            Struct struct = (Struct) structObject;
-
-            Object[] attributes = struct.getAttributes();
-            int productID = ((BigDecimal) attributes[0]).intValue();
-            String name = (String) attributes[1];
-            String category = (String) attributes[2];
-
-            Product product = new Product(productID, name, category);
-            productList.add(product);
-        }
-        return productList;
-    }
-
     public void addCustomer(Customer cus) throws SQLException {
         String createReview = "{call addCustomer(?)}";
         CallableStatement stmt = conn.prepareCall(createReview);
@@ -397,15 +368,46 @@ public class SuperstoreServices {
         stmt.execute();
     }
 
-    /*******************/
+    public List<Order> viewAllOrders() throws SQLException, ClassNotFoundException {
+        CallableStatement stmt = conn.prepareCall("{call viewPackage.viewOrders(?)}");
+        stmt.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
+        stmt.execute();
+        ResultSet rs = (ResultSet) stmt.getObject(1);
+        List<Order> listOrders = new ArrayList<Order>();
+        while (rs.next()) {
+            listOrders.add(new Order(
+                    rs.getInt("customerID"),
+                    rs.getInt("storeID"),
+                    rs.getDate("orderDate")));
+        }
+        return listOrders;
+    }
+
+    public List<Product> getAllProducts() throws SQLException, ClassNotFoundException {
+        CallableStatement stmt = conn.prepareCall("{call viewPackage.viewProducts(?)}");
+        stmt.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
+        stmt.execute();
+        ResultSet rs = (ResultSet) stmt.getObject(1);
+        List<Product> products = new ArrayList<Product>();
+        while (rs.next()) {
+            products.add(new Product(
+                    rs.getInt("productID"),
+                    rs.getString("name"),
+                    rs.getString("category")));
+        }
+        return products;
+    }
+
+    public List<Store> getAllStores() throws SQLException, ClassNotFoundException {
+        CallableStatement stmt = conn.prepareCall("{call viewPackage.viewStores(?) }");
+        stmt.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
+        stmt.execute();
+        ResultSet rs = (ResultSet) stmt.getObject(1);
+        List<Store> stores = new ArrayList<Store>();
+        while (rs.next()) {
+            stores.add(new Store(rs.getInt("storeID"), rs.getString("name")));
+        }
+        return stores;
+    }
 
 }
-
-// Array arr = stmt.getArray(1);
-// ResultSet rs = arr.getResultSet();
-// while (rs.next()) {
-// int productID = rs.getInt(1);
-// String name = rs.getString(2);
-// String category = rs.getString(3);
-// Product prod = new Product(productID, name, category);
-// productList.add(prod);

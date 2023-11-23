@@ -6,13 +6,17 @@ DROP TABLE Warehouses_Stores;
 DROP TABLE Reviews;
 DROP TABLE Orders;
 DROP TABLE Customers;
-DROP TABLE Products;
 DROP TABLE Warehouses;
 DROP TABLE Stores;
 DROP TABLE Loglogins;
 DROP TABLE Logwarehousemodification;
 DROP TABLE Logordermodification;
 DROP TABLE Logreviewmodification;
+--DROP TABLE Digitalmovies;
+--DROP TABLE Dvds;
+--DROP TABLE Movies;
+DROP TABLE Products;
+
 
 CREATE TABLE Stores(
     storeID NUMBER(2) GENERATED ALWAYS AS IDENTITY CONSTRAINT store_pk PRIMARY KEY,
@@ -368,7 +372,8 @@ VALUES (4, 0, NULL, 15, 12);
 
 CREATE OR REPLACE TYPE order_type AS OBJECT(
     customerID      NUMBER(2),
-    storeID         NUMBER(2)
+    storeID         NUMBER(2),
+    orderDate       DATE
 );
 /
 /* this function taks a productid as input and will calculate the total inventory for that product across all tables */
@@ -516,6 +521,9 @@ CREATE OR REPLACE PACKAGE viewPackage AS
     /** BIANCA **/
     PROCEDURE viewCustomers(cursor_c IN OUT cursor_table);
     /** AMY **/
+    PROCEDURE viewProducts (cursor_view IN OUT cursor_table);
+    PROCEDURE viewOrders (cursor_view IN OUT cursor_table);
+    PROCEDURE viewStores (cursor_view IN OUT cursor_table);
     
 END viewPackage;
 /
@@ -531,6 +539,26 @@ AS
     END;
     /** AMY **/
     
+    PROCEDURE viewProducts (cursor_view IN OUT cursor_table)
+    AS
+    BEGIN
+        OPEN cursor_view FOR
+            SELECT * FROM Products;
+    END;
+    
+    PROCEDURE viewOrders (cursor_view IN OUT cursor_table)
+    AS 
+    BEGIN
+        OPEN cursor_view FOR
+            SELECT * FROM Orders;
+    END;
+    
+    PROCEDURE viewStores (cursor_view IN OUT cursor_table)
+    AS
+    BEGIN 
+        OPEN cursor_view FOR
+            SELECT * FROM Stores;
+    END;
 END viewPackage;
 /
 /****/
@@ -809,58 +837,6 @@ BEGIN
 END;
 
 /
-
-CREATE OR REPLACE TYPE product_type AS OBJECT(
-    productID       NUMBER(2),
-    name            VARCHAR2(20),
-    category        VARCHAR2(20)
-);
-
-/
-    
-CREATE OR REPLACE TYPE products_collection AS TABLE OF product_type;
-/
-
-CREATE OR REPLACE FUNCTION getproducts RETURN products_collection
-    AS  
-        v_products products_collection := products_collection();
-    BEGIN
-        FOR curProduct IN (SELECT * FROM Products) LOOP
-            v_products.extend;
-            v_products(v_products.count) := product_type(curProduct.productID, curProduct.name, curProduct.category);
-        END LOOP;
-    RETURN v_products;
-    
-    EXCEPTION 
-        WHEN OTHERS THEN 
-            dbms_output.put_line('something went wrong');
-END;
-/
-CREATE OR REPLACE TYPE order_typeWithDate AS OBJECT(
-    customerID      NUMBER(2),
-    storeID         NUMBER(2),
-    orderDate       DATE
-);
-/
-CREATE OR REPLACE TYPE orders_collection AS TABLE OF order_type;
-/
-CREATE OR REPLACE FUNCTION getAllOrders RETURN orders_collection
-    AS
-        v_orders orders_collection := orders_collection();
-    BEGIN 
-        FOR curOrder IN (SELECT * FROM Orders) LOOP
-            v_orders.extend;
-            v_orders(v_orders.count) := order_type(curOrder.customerID, curOrder.storeID, curOrder.orderDate);
-        END LOOP;
-        
-    RETURN v_orders;
-    
-    EXCEPTION 
-        WHEN OTHERS THEN 
-            dbms_output.put_line('something went wrong');
-        RAISE;
-END;
-/
 CREATE OR REPLACE TYPE customer_type AS OBJECT(
     firstname   VARCHAR2(40),
     lastname    VARCHAR2(20),
@@ -885,15 +861,6 @@ CREATE OR REPLACE PROCEDURE addCustomer(customer IN customer_type)
     END;
 
 /
-DECLARE
-    v_result orders_collection;
-BEGIN
-    -- Call the function and store the result in v_result
-    v_result := getAllOrders;
-
-    -- Loop through the collection and print the values
-    dbms_output.put_line(v_result(1).customerID || v_result(1).storeID);
-END;
 
 
 

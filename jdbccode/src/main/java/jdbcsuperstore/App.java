@@ -1,10 +1,8 @@
 package jdbcsuperstore;
 
-import java.beans.Statement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.sql.ResultSet;
 import java.util.*;
 
@@ -24,7 +22,7 @@ public class App {
             services = new SuperstoreServices("jdbc:oracle:thin:", "198.168.52.211", "1521", user, password);
             conn = services.getConnection();
             // viewCustomerInfo();
-            addCustomer();
+            viewAllStoreInfo();
             conn.close();
 
         } catch (NullPointerException e) {
@@ -117,7 +115,7 @@ public class App {
         }
     }
 
-    public static void viewCustomerInfo() {
+    public static void viewCustomerInfo() throws ClassNotFoundException {
         List<Customer> customers = null;
         try {
             customers = services.viewCustomers();
@@ -299,14 +297,7 @@ public class App {
         }
     }
 
-    public static void showProducts() throws SQLException {
-        List<Product> listProducts = services.getListofProducts();
-        for (Product prod : listProducts) {
-            System.out.println(prod);
-        }
-    }
-
-    public static void addCustomer() throws SQLException {
+    public static void addCustomer() throws SQLException, ClassNotFoundException {
         boolean isSuccessful = false;
         while (!isSuccessful) {
             try {
@@ -326,7 +317,7 @@ public class App {
                 System.out.println("country");
                 String country = scan.nextLine();
 
-                Customer newCus = new Customer(firstname, lastname, email, address, city, province, country);
+                Customer newCus = new Customer(firstname, lastname, email, address, city, province, country, conn);
                 services.addCustomer(newCus);
                 System.out.println("Customer added succesffuly!");
                 isSuccessful = true;
@@ -335,6 +326,27 @@ public class App {
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public static void viewAllOrderInfo() throws SQLException, ClassNotFoundException {
+        List<Order> orders = services.viewAllOrders();
+        for (Order o : orders) {
+            System.out.println(o);
+        }
+    }
+
+    public static void viewAllProductInfo() throws SQLException, ClassNotFoundException {
+        List<Product> products = services.getAllProducts();
+        for (Product p : products) {
+            System.out.println(p);
+        }
+    }
+
+    public static void viewAllStoreInfo() throws SQLException, ClassNotFoundException {
+        List<Store> stores = services.getAllStores();
+        for (Store s : stores) {
+            System.out.println(s);
         }
     }
 }
