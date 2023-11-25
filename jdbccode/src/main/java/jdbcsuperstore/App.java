@@ -3,6 +3,7 @@
  */
 package jdbcsuperstore;
 
+import java.io.Console;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
@@ -17,10 +18,16 @@ public class App {
     public static SuperstoreServices services = null;
 
     public static void main(String[] args) throws SQLException {
+        Console console = System.console() ;
         System.out.println("-Welcome to SuperStore management application- \n Enter your DB username..");
         String user = scan.nextLine();
         System.out.println("Enter your password..");
-        String password = scan.nextLine();
+		char [] pass = console.readPassword("Enter password: ");
+        String password = "";
+        for (char letter : pass)
+        {
+            password+=letter;
+        }
         try {
             services = new SuperstoreServices("jdbc:oracle:thin:", "198.168.52.211", "1521", user, password);
             conn = services.getConnection();
