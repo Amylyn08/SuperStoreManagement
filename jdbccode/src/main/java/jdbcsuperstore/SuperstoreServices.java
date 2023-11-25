@@ -9,14 +9,13 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.naming.spi.DirStateFactory.Result;
-
 import java.sql.Array;
 
 public class SuperstoreServices {
     private Connection conn;
 
-    public SuperstoreServices(String driver, String host, String port, String user, String password) throws SQLException {
+    public SuperstoreServices(String driver, String host, String port, String user, String password)
+            throws SQLException {
         createConnection(driver, host, port, user, password);
     }
 
@@ -26,7 +25,8 @@ public class SuperstoreServices {
             this.conn.close();
     }
 
-    public void createConnection(String driver, String host, String port, String user, String password) throws SQLException {
+    public void createConnection(String driver, String host, String port, String user, String password)
+            throws SQLException {
         if (!this.connectionActive()) {
             this.conn = DriverManager.getConnection(
                     "jdbc:oracle:thin:@198.168.52.211:1521/pdbora19c.dawsoncollege.qc.ca",
@@ -132,6 +132,12 @@ public class SuperstoreServices {
         }
     }
 
+    /**
+     * Validating if ReviewID exists, 1 if yes, 0 means no.
+     * 
+     * @param reviewID - The review id that is getting used.
+     * @throws SQLException - if id entered by user does not exist
+     */
     public void isReviewIDValid(int reviewID) throws SQLException {
         String sql = "{ ? = call getReviewIDs(?)}";
         CallableStatement stmt = conn.prepareCall(sql);
@@ -146,10 +152,6 @@ public class SuperstoreServices {
         }
     }
 
-    // functions and procedures here:
-
-    /********** BIANCA *********/
-
     /**
      * this function will call the viewCustomer procedure and loop through the
      * cursor to print out info
@@ -159,8 +161,7 @@ public class SuperstoreServices {
      * @throws SQLException
      */
 
-
-    public List<Customer> viewCustomers() throws SQLException{
+    public List<Customer> viewCustomers() throws SQLException {
         CallableStatement cs = this.conn.prepareCall("{call viewPackage.viewCustomers(?)}");
         cs.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
         cs.execute();
@@ -181,61 +182,59 @@ public class SuperstoreServices {
 
     }
 
-     /**
-     * this function will call the viewCustomer procedure and loop through the cursor to print out info
+    /**
+     * this function will call the viewCustomer procedure and loop through the
+     * cursor to print out info
      * for all current customers in our table.
+     * 
      * @return - represents the list of customers
      * @throws SQLException
      */
-     public List<Review> viewReviews() throws SQLException
-     {
+    public List<Review> viewReviews() throws SQLException {
         CallableStatement cs = this.conn.prepareCall("{call viewPackage.viewReviews(?)}");
         cs.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
         cs.execute();
-        ResultSet rs = (ResultSet)cs.getObject(1);
+        ResultSet rs = (ResultSet) cs.getObject(1);
         List<Review> reviews = new ArrayList<Review>();
-        while(rs.next())
-        {
+        while (rs.next()) {
             reviews.add(new Review(
-                rs.getInt("REVIEWID"),
-                rs.getInt("PRODUCTID"),
-                rs.getInt("CUSTOMERID"),
-                rs.getDouble("STAR"),
-                rs.getInt("FLAGNUMS"),
-                rs.getString("DESCRIPTION")
-                 ));
+                    rs.getInt("REVIEWID"),
+                    rs.getInt("PRODUCTID"),
+                    rs.getInt("CUSTOMERID"),
+                    rs.getDouble("STAR"),
+                    rs.getInt("FLAGNUMS"),
+                    rs.getString("DESCRIPTION")));
         }
         return reviews;
 
-     }
+    }
 
-     /**
-     * this function will call the viewWarehouses procedure and loop through the cursor to print out info
+    /**
+     * this function will call the viewWarehouses procedure and loop through the
+     * cursor to print out info
      * for all current warehouses in our table.
+     * 
      * @return - represents the list of customers
      * @throws SQLException
      */
-     public List<Warehouse> viewWarehouse() throws SQLException
-     {
+    public List<Warehouse> viewWarehouse() throws SQLException {
         CallableStatement cs = this.conn.prepareCall("{call viewPackage.viewWarehouses(?)}");
         cs.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
         cs.execute();
-        ResultSet rs = (ResultSet)cs.getObject(1);
+        ResultSet rs = (ResultSet) cs.getObject(1);
         List<Warehouse> warehouses = new ArrayList<Warehouse>();
-        while(rs.next())
-        {
+        while (rs.next()) {
             warehouses.add(new Warehouse(
-                rs.getInt("warehouseID"),
-                rs.getString("name"),
-                rs.getString("streetAddress"),
-                rs.getString("city"),
-                rs.getString("province"),
-                rs.getString("country")
-                 ));
+                    rs.getInt("warehouseID"),
+                    rs.getString("name"),
+                    rs.getString("streetAddress"),
+                    rs.getString("city"),
+                    rs.getString("province"),
+                    rs.getString("country")));
         }
         return warehouses;
 
-     }
+    }
 
     /**
      * this function takes an Order object as input and creates a new order in the
@@ -280,18 +279,20 @@ public class SuperstoreServices {
     }
 
     /**
-     * this function takes all parameters necessary to call the newDeliveryIncome, which lets employers log in a new
+     * this function takes all parameters necessary to call the newDeliveryIncome,
+     * which lets employers log in a new
      * delivery and update the quantity in a particular warehouse
-     * @param productID - represents the id of the product in the delivery
-     * @param warehouseID - represents the id of the warehouse the delivery is going to
-     * @param quantity - represents the quantity in the delivery
+     * 
+     * @param productID   - represents the id of the product in the delivery
+     * @param warehouseID - represents the id of the warehouse the delivery is going
+     *                    to
+     * @param quantity    - represents the quantity in the delivery
      * @throws SQLException
      */
     public void newDeliveryIncome(int productID, int warehouseID, int quantity) throws SQLException {
         isProductIDValid(productID);
         isWarehouseIDValid(warehouseID);
-        if (quantity < 0)
-        {
+        if (quantity < 0) {
             throw new IllegalArgumentException("Quantities cannot be negative");
         }
         String addDelivery = "{call newDeliveryIncome(?, ?, ?)}";
@@ -356,9 +357,6 @@ public class SuperstoreServices {
         stmt.execute();
     }
 
-    /*******************/
-
-    /********** AMY *********/
     /**
      * This method creates and inserts the review into the DB
      * 
@@ -409,10 +407,11 @@ public class SuperstoreServices {
     }
 
     /**
-     * This function
+     * This function returns the num representing how many orders a product has.
      * 
-     * @param productID
-     * @return
+     * @param productID - The id that is being used.
+     * @return - returns an interger corresponding to how many orders has been
+     *         placed on this product.
      * @throws SQLException
      */
     public int numOrders(int productID) throws SQLException {
@@ -427,9 +426,9 @@ public class SuperstoreServices {
     }
 
     /**
-     * This function
+     * This function removes a warehouse that is specified by it's ID.
      * 
-     * @param warehouseID
+     * @param warehouseID - The ID of the warehouse that is getting deleted
      * @throws SQLException
      */
     public void removeWarehouse(int warehouseID) throws SQLException {
@@ -440,6 +439,12 @@ public class SuperstoreServices {
         stmt.execute();
     }
 
+    /**
+     * Adds a customer using a customer object to the database.
+     * 
+     * @param cus - The customer object with all valid arguments.
+     * @throws SQLException
+     */
     public void addCustomer(Customer cus) throws SQLException {
         String createReview = "{call addCustomer(?)}";
         CallableStatement stmt = conn.prepareCall(createReview);
@@ -447,6 +452,13 @@ public class SuperstoreServices {
         stmt.execute();
     }
 
+    /**
+     * Shows all orders and it's column details.
+     * 
+     * @return - A list of objects from the database.
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public List<Order> viewAllOrders() throws SQLException, ClassNotFoundException {
         CallableStatement stmt = conn.prepareCall("{call viewPackage.viewOrders(?)}");
         stmt.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
@@ -463,6 +475,14 @@ public class SuperstoreServices {
         return listOrders;
     }
 
+    /**
+     * Retrieves all products from the databse.
+     * 
+     * @return - A list representing all the products and it's columns from the
+     *         database.
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public List<Product> getAllProducts() throws SQLException, ClassNotFoundException {
         CallableStatement stmt = conn.prepareCall("{call viewPackage.viewProducts(?)}");
         stmt.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
@@ -478,6 +498,13 @@ public class SuperstoreServices {
         return products;
     }
 
+    /**
+     * Retrieves all the store from the database.
+     * 
+     * @return - A list of all stores with it's respective columns.
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public List<Store> getAllStores() throws SQLException, ClassNotFoundException {
         CallableStatement stmt = conn.prepareCall("{call viewPackage.viewStores(?) }");
         stmt.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
@@ -490,6 +517,17 @@ public class SuperstoreServices {
         return stores;
     }
 
+    /**
+     * Retrieves products from the database depending on which category specified by
+     * user.
+     * 
+     * @param categoryName - The category of the products in which user would like
+     *                     to view.
+     * @return - A list of products who's category is what is specific through the
+     *         user.
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public List<Product> getProductsByCategory(String categoryName) throws SQLException, ClassNotFoundException {
         CallableStatement stmt = conn.prepareCall("{call viewPackage.viewProductsByCategory(?,?)}");
         stmt.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);

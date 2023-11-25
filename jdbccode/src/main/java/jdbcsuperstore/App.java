@@ -1,9 +1,7 @@
 package jdbcsuperstore;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.ResultSet;
 import java.util.*;
 
 /**
@@ -71,6 +69,10 @@ public class App {
 
     }
 
+    /**
+     * The menu of customer related viewing options.
+     * Takes in user input to chose option.
+     */
     public static void viewCustomerMenu() {
         int input = 0;
         do {
@@ -93,6 +95,10 @@ public class App {
         } while (input < 1 || input > 3);
     }
 
+    /**
+     * The menu related to all product viewing related options.
+     * Takes in user input to chose option.
+     */
     public static void viewReviewProdMenu() {
         int input = 0;
         do {
@@ -131,6 +137,10 @@ public class App {
         } while (input < 1 || input > 7);
     }
 
+    /**
+     * The menu to all Order related viewing options
+     * Takes in user input to chose option.
+     */
     public static void viewOrderMenu() {
         int input = 0;
         do {
@@ -155,6 +165,10 @@ public class App {
         } while (input < 1 || input > 4);
     }
 
+    /**
+     * Menu option for all database manipulation related things.
+     * Takes in user input to chose option.
+     */
     public static void manipulationMenu() {
         int input = 0;
         do {
@@ -295,6 +309,9 @@ public class App {
         }
     }
 
+    /**
+     * Checks the total available inventory for a product.
+     */
     public static void checkTotalProdInventory() {
         boolean isSuccessful = false;
         while (!isSuccessful) {
@@ -316,6 +333,9 @@ public class App {
         }
     }
 
+    /**
+     * Prints all the customers from a list of customers.
+     */
     public static void viewCustomerInfo() {
         List<Customer> customers = null;
         try {
@@ -329,6 +349,9 @@ public class App {
         }
     }
 
+    /**
+     * Prints all warehouse info details from a list of warehouses.
+     */
     public static void viewWarehouseInfo() {
         List<Warehouse> warehouses = null;
         try {
@@ -342,6 +365,9 @@ public class App {
         }
     }
 
+    /**
+     * Prints all review information from a list of reviews
+     */
     public static void viewReviewInfo() {
         List<Review> reviews = null;
         try {
@@ -355,6 +381,9 @@ public class App {
         }
     }
 
+    /**
+     * Prints all customer info who's review are flagged.
+     */
     public static void viewFlaggedCustomers() {
         List<String> flaggedCus = null;
         try {
@@ -369,6 +398,10 @@ public class App {
         }
     }
 
+    /**
+     * Removes a product from the database using removeProduct() from
+     * SuperStoreServices.
+     */
     public static void removeProduct() {
         boolean isSuccessful = false;
         while (!isSuccessful) {
@@ -393,6 +426,10 @@ public class App {
         }
     }
 
+    /**
+     * Views the total number of orders for a specific product.
+     * With the help of numOrders() from SuperStore Services.
+     */
     public static void viewNumOrders() {
         boolean isSuccessful = false;
         while (!isSuccessful) {
@@ -414,6 +451,10 @@ public class App {
         }
     }
 
+    /**
+     * Displays the average review score for a product.
+     * With the help of calculateAvgReviewScore() from SuperStoreServices.
+     */
     public static void getAvgReviewScoreforProduct() {
         boolean isSuccessful = false;
         while (!isSuccessful) {
@@ -435,6 +476,10 @@ public class App {
         }
     }
 
+    /**
+     * Creates a review and sends it to the database.
+     * With the help of createReview() from SuperStoreServices.
+     */
     public static void createReview() {
         boolean isSuccessful = false;
         while (!isSuccessful) {
@@ -468,6 +513,10 @@ public class App {
         }
     }
 
+    /**
+     * Flags a review and sends it to the database.
+     * With the help of flagReview() from SuperStoreServices.
+     */
     public static void flagReview() {
         boolean isSuccessful = false;
         while (!isSuccessful) {
@@ -492,6 +541,10 @@ public class App {
         }
     }
 
+    /**
+     * Shows all products by a specific category specified through user.
+     * With the help of getProductsByCategory() from SuperStoreServices.
+     */
     public static void viewProductsByCategory() {
         boolean isSuccessful = false;
         while (!isSuccessful) {
@@ -514,6 +567,9 @@ public class App {
         }
     }
 
+    /**
+     * Remove warehouse from database.
+     */
     public static void removeWarehouse() {
         boolean isSuccessful = false;
         while (!isSuccessful) {
@@ -539,6 +595,9 @@ public class App {
         }
     }
 
+    /**
+     * Asks for valid information, and adds the customer object to the database.
+     */
     public static void addCustomer() {
         boolean isSuccessful = false;
         while (!isSuccessful) {
@@ -578,6 +637,9 @@ public class App {
         }
     }
 
+    /**
+     * Prints all orders information, using a list of orders.
+     */
     public static void viewAllOrderInfo() {
         try {
             List<Order> orders = services.viewAllOrders();
@@ -593,6 +655,9 @@ public class App {
         }
     }
 
+    /**
+     * Prints all products information, using a list of products.
+     */
     public static void viewAllProductInfo() {
         try {
             List<Product> products = services.getAllProducts();
@@ -608,6 +673,9 @@ public class App {
         }
     }
 
+    /**
+     * Prints all store information, using a list of Stores.
+     */
     public static void viewAllStoreInfo() {
         try {
             List<Store> stores = services.getAllStores();
