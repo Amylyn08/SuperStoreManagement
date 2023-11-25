@@ -1,3 +1,6 @@
+/**@fileoverview - A superstore management system, capable of viewing all information, and manipulating the database.
+ * @authors Amy Nguyen, Bianca Rossetti
+ */
 package jdbcsuperstore;
 
 import java.sql.Connection;
@@ -40,32 +43,44 @@ public class App {
      */
     public static void mainMenu() {
         int input = 0;
+        System.out.println(
+                "\n ------------------------------------------------------------- \n Here are your options.. choose wisely. ");
+        System.out.println("1. View information about customers");
+        System.out.println("2. View information about reviews and products");
+        System.out.println("3. View information about orders");
+        System.out.println("4. Add or modify");
+        System.out.println("5. EXIT \n");
+        System.out.println("Enter the number of the option you would like to select: ");
         do {
-            System.out.println(
-                    "\n ------------------------------------------------------------- \n Here are your options.. choose wisely. ");
-            System.out.println("1. View information about customers");
-            System.out.println("2. View information about reviews and products");
-            System.out.println("3. View information about orders");
-            System.out.println("4. Add or modify");
-            System.out.println("5. EXIT");
-            System.out.println("Enter the number of the option you would like to select: ");
-            input = Integer.parseInt(scan.nextLine());
-            if (input == 1) {
-                System.out.println("\033c");
-                viewCustomerMenu();
-            } else if (input == 2) {
-                System.out.println("\033c");
-                viewReviewProdMenu();
-            } else if (input == 3) {
-                viewOrderMenu();
-            } else if (input == 4) {
-                manipulationMenu();
-            } else if (input == 5) {
-                System.out.println("Chosen \"EXIT\". System exiting.. Goodbye!!");
-                return;
+
+            try {
+                input = Integer.parseInt(scan.nextLine());
+            } catch (NumberFormatException e) {
+                input = 0;
+            }
+            switch (input) {
+                case 1:
+                    System.out.println("\033c");
+                    viewCustomerMenu();
+                    break;
+                case 2:
+                    System.out.println("\033c");
+                    viewReviewProdMenu();
+                    break;
+                case 3:
+                    viewOrderMenu();
+                    break;
+                case 4:
+                    manipulationMenu();
+                    break;
+                case 5:
+                    System.out.println("Chosen \"EXIT\". System exiting.. Goodbye!!");
+                    return;
+                default:
+                    System.out.println("Invalid option. Please try again.");
             }
 
-        } while (input < 1 || input > 4);
+        } while (true);
 
     }
 
@@ -75,24 +90,34 @@ public class App {
      */
     public static void viewCustomerMenu() {
         int input = 0;
+        System.out.println("\n------------------------------------------------------------- ");
+        System.out.println("1. View all customer information");
+        System.out.println("2. View names of flagged customers");
+        System.out.println("3. BACK \n");
+        System.out.println("Enter the number of the option you would like to select: ");
         do {
-            System.out.println("\n------------------------------------------------------------- ");
-            System.out.println("1. View all customer information");
-            System.out.println("2. View names of flagged customers");
-            System.out.println("3. BACK");
-            System.out.println("Enter the number of the option you would like to select: ");
-            input = Integer.parseInt(scan.nextLine());
-            if (input == 1) {
-                System.out.println("\033c");
-                viewCustomerInfo();
-            } else if (input == 2) {
-                System.out.println("\033c");
-                viewFlaggedCustomers();
-            } else if (input == 3) {
-                System.out.println("\033c");
-                mainMenu();
+            try {
+                input = Integer.parseInt(scan.nextLine());
+            } catch (NumberFormatException e) {
+                input = 0;
             }
-        } while (input < 1 || input > 3);
+            switch (input) {
+                case 1:
+                    System.out.println("\033c");
+                    viewCustomerInfo();
+                    break;
+                case 2:
+                    System.out.println("\033c");
+                    viewFlaggedCustomers();
+                    break;
+                case 3:
+                    System.out.println("\033c");
+                    mainMenu();
+                    break;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
+        } while (true);
     }
 
     /**
@@ -104,37 +129,51 @@ public class App {
         do {
             System.out.println("\n------------------------------------------------------------- ");
             System.out.println("1. View all reviews");
-            System.out.println("2. Find average review score of a product");
+            System.out.println("2. Find the average review score of a product");
             System.out.println("3. View all information about products");
             System.out.println("4. View all information about products in a specific category");
             System.out.println("5. View all information about stores");
             System.out.println("6. View all information about warehouses");
-            System.out.println("7. BACK");
+            System.out.println("7. BACK \n");
             System.out.println("Enter the number of the option you would like to select: ");
-            input = Integer.parseInt(scan.nextLine());
-            if (input == 1) {
-                System.out.println("\033c");
-                viewReviewInfo();
-            } else if (input == 2) {
-                System.out.println("\033c");
-                getAvgReviewScoreforProduct();
-            } else if (input == 3) {
-                System.out.println("\033c");
-                viewAllProductInfo();
-            } else if (input == 4) {
-                System.out.println("\033c");
-                viewProductsByCategory();
-            } else if (input == 5) {
-                System.out.println("\033c");
-                viewAllStoreInfo();
-            } else if (input == 6) {
-                System.out.println("\033c");
-                viewWarehouseInfo();
-            } else if (input == 7) {
-                mainMenu();
+            try {
+                input = Integer.parseInt(scan.nextLine());
+            } catch (NumberFormatException e) {
+                input = 0;
             }
 
-        } while (input < 1 || input > 7);
+            switch (input) {
+                case 1:
+                    System.out.println("\033c");
+                    viewReviewInfo();
+                    break;
+                case 2:
+                    System.out.println("\033c");
+                    getAvgReviewScoreforProduct();
+                    break;
+                case 3:
+                    System.out.println("\033c");
+                    viewAllProductInfo();
+                    break;
+                case 4:
+                    System.out.println("\033c");
+                    viewProductsByCategory();
+                    break;
+                case 5:
+                    System.out.println("\033c");
+                    viewAllStoreInfo();
+                    break;
+                case 6:
+                    System.out.println("\033c");
+                    viewWarehouseInfo();
+                    break;
+                case 7:
+                    mainMenu();
+                    break;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
+        } while (true);
     }
 
     /**
@@ -143,26 +182,39 @@ public class App {
      */
     public static void viewOrderMenu() {
         int input = 0;
+        System.out.println("\n------------------------------------------------------------- ");
+        System.out.println("1. View total inventory of a specific product");
+        System.out.println("2. Calculate the number of orders placed on a product");
+        System.out.println("3. View all information about orders");
+        System.out.println("4. BACK \n");
+        System.out.println("Enter the number of the option you would like to select: ");
         do {
-            System.out.println("\n------------------------------------------------------------- ");
-            System.out.println("1. View total inventory of a specific product");
-            System.out.println("2. Calculate the number of orders placed on a product");
-            System.out.println("3. View all information about orders");
-            System.out.println("4. BACK");
-            System.out.println("Enter the number of the option you would like to select: ");
-            input = Integer.parseInt(scan.nextLine());
-            if (input == 1) {
-                System.out.println("\033c");
-                checkTotalProdInventory();
-            } else if (input == 2) {
-                System.out.println("\033c");
-                viewNumOrders();
-            } else if (input == 3) {
-                System.out.println("\033c");
-                viewAllOrderInfo();
-            } else if (input == 4)
-                mainMenu();
-        } while (input < 1 || input > 4);
+            try {
+                input = Integer.parseInt(scan.nextLine());
+            } catch (NumberFormatException e) {
+                input = 0;
+            }
+
+            switch (input) {
+                case 1:
+                    System.out.println("\033c");
+                    checkTotalProdInventory();
+                    break;
+                case 2:
+                    System.out.println("\033c");
+                    viewNumOrders();
+                    break;
+                case 3:
+                    System.out.println("\033c");
+                    viewAllOrderInfo();
+                    break;
+                case 4:
+                    mainMenu();
+                    break;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
+        } while (true);
     }
 
     /**
@@ -171,42 +223,59 @@ public class App {
      */
     public static void manipulationMenu() {
         int input = 0;
+        System.out.println("\n------------------------------------------------------------- ");
+        System.out.println("1. Place an order an order");
+        System.out.println("2. Remove a product");
+        System.out.println("3. Log a new delivery into the system");
+        System.out.println("4. Flag a review");
+        System.out.println("5. Create a review");
+        System.out.println("6. Remove warehouse");
+        System.out.println("7. Add customer");
+        System.out.println("8. BACK \n");
+        System.out.println("Enter the number of the option you would like to select: ");
         do {
-            System.out.println("\n------------------------------------------------------------- ");
-            System.out.println("1. Place an order an order");
-            System.out.println("2. Remove a product");
-            System.out.println("3. Log a new delivery into the system");
-            System.out.println("4. Flag a review");
-            System.out.println("5. Create a review");
-            System.out.println("6. Remove  warehouse");
-            System.out.println("7. Add customer");
-            System.out.println("8. BACK");
-            System.out.println("Enter the number of the option you would like to select: ");
-            input = Integer.parseInt(scan.nextLine());
-            if (input == 1) {
-                System.out.println("\033c");
-                placeOrder();
-            } else if (input == 2) {
-                System.out.println("\033c");
-                removeProduct();
-            } else if (input == 3) {
-                System.out.println("\033c");
-                logDelivery();
-            } else if (input == 4) {
-                System.out.println("\033c");
-                flagReview();
-            } else if (input == 5) {
-                System.out.println("\033c");
-                createReview();
-            } else if (input == 6) {
-                System.out.println("\033c");
-                removeWarehouse();
-            } else if (input == 7) {
-                System.out.println("\033c");
-                addCustomer();
-            } else if (input == 8)
-                mainMenu();
-        } while (input < 1 || input > 8);
+            try {
+                input = Integer.parseInt(scan.nextLine());
+            } catch (NumberFormatException e) {
+                input = 0;
+            }
+
+            switch (input) {
+                case 1:
+                    System.out.println("\033c");
+                    placeOrder();
+                    break;
+                case 2:
+                    System.out.println("\033c");
+                    removeProduct();
+                    break;
+                case 3:
+                    System.out.println("\033c");
+                    logDelivery();
+                    break;
+                case 4:
+                    System.out.println("\033c");
+                    flagReview();
+                    break;
+                case 5:
+                    System.out.println("\033c");
+                    createReview();
+                    break;
+                case 6:
+                    System.out.println("\033c");
+                    removeWarehouse();
+                    break;
+                case 7:
+                    System.out.println("\033c");
+                    addCustomer();
+                    break;
+                case 8:
+                    mainMenu();
+                    break;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
+        } while (true);
     }
 
     /**
