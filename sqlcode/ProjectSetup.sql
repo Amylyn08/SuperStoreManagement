@@ -12,11 +12,17 @@ DROP TABLE Loglogins;
 DROP TABLE Logwarehousemodification;
 DROP TABLE Logordermodification;
 DROP TABLE Logreviewmodification;
---DROP TABLE Digitalmovies;
---DROP TABLE Dvds;
---DROP TABLE Movies;
 DROP TABLE Products;
-
+DROP PACKAGE viewCustomerMenu;
+DROP PACKAGE viewReviewProdMenu;
+DROP PACKAGE viewOrderMenu;
+DROP PACKAGE dataManipulation;
+DROP PACKAGE validatingIDs;
+DROP PROCEDURE logUserLogin;
+DROP PROCEDURE checkIfOrderStillValid;
+DROP TRIGGER After_OrderModification_Insert;
+DROP TRIGGER Before_Review_DeleteInsert;
+DROP TRIGGER beforeModifyingWarehouse;
 
 CREATE TABLE Stores(
     storeID NUMBER(2) GENERATED ALWAYS AS IDENTITY CONSTRAINT store_pk PRIMARY KEY,
@@ -376,30 +382,49 @@ CREATE OR REPLACE TYPE order_type AS OBJECT(
     orderDate       DATE
 );
 /
-/* this function taks a productid as input and will calculate the total inventory for that product across all tables */
-CREATE OR REPLACE FUNCTION totalInventory(productIDsearch Products.productID%TYPE)
-RETURN NUMBER
-AS
-    totalnum NUMBER(10);
-BEGIN
-    SELECT
-        SUM(quantity) INTO totalNum
-    FROM
-        Warehouses_Products
-    WHERE
-        productId = productIDsearch;
-    RETURN(totalNum);
-END;
+
+CREATE OR REPLACE TYPE review_type AS OBJECT(
+    productID       NUMBER(2),
+    customerID      NUMBER(2),
+    star            NUMBER(1),
+    flagnums        NUMBER(1),
+    description     VARCHAR2(100)
+);
 /
 
-CREATE OR REPLACE PACKAGE calculations AS
+CREATE OR REPLACE TYPE customer_type AS OBJECT(
+    firstname   VARCHAR2(40),
+    lastname    VARCHAR2(20),
+    email       VARCHAR2(30),
+    streetAddress   VARCHAR2(40),
+    city            VARCHAR2(40),
+    province        VARCHAR2(40),
+    country         VARCHAR2(40)
+    );
+/
+
+CREATE OR REPLACE PACKAGE viewCustomerMenu
+AS
+    TYPE cursor_table IS REF CURSOR;
     TYPE cus_names IS TABLE OF VARCHAR(100)
     INDEX BY PLS_INTEGER;
     FUNCTION flaggedCustomers RETURN cus_names;
-END calculations;
+    PROCEDURE viewCustomers(cursor_c IN OUT cursor_table);
+END viewCustomerMenu;
 /
 
-CREATE OR REPLACE PACKAGE BODY calculations AS
+CREATE OR REPLACE PACKAGE BODY viewCustomerMenu
+AS
+    /* this function returns all the information for customers 
+    in the form of a cursor*/
+    PROCEDURE viewCustomers(cursor_c IN OUT cursor_table)
+    AS
+    BEGIN
+        OPEN cursor_c FOR
+            SELECT * FROM Customers;
+    END;
+    
+    /*this function returns the names of the flagged customers*/
     FUNCTION flaggedCustomers
     RETURN cus_names
     AS 
@@ -415,229 +440,39 @@ CREATE OR REPLACE PACKAGE BODY calculations AS
             flagNums > 0;
         RETURN(customers);
     END;
-END calculations;
+END viewCustomerMenu;
 /
 
-CREATE OR REPLACE PROCEDURE checkIfOrderStillValid(newOrderID IN Orders.orderID%TYPE)
+
+CREATE OR REPLACE PACKAGE viewReviewProdMenu
 AS
-    numOrders NUMBER(2);
-BEGIN
-    SELECT
-        COUNT(*) INTO numOrders
-    FROM
-        Orders_Products
-    WHERE
-        orderID = newOrderID;
-    IF numOrders IS NULL OR numOrders = 0 THEN
-        DELETE FROM Orders WHERE orderID = newOrderID;
-    END IF;
-END;
-/
-
-BEGIN
-    checkIfOrderStillValid(26);
-END;
-/
-/* createOrder (orderID OUT, storeID, cusID): function that takes as input storeID and customerID */
-CREATE OR REPLACE PROCEDURE createOrder(
-orderObj IN order_type, 
-newOrderID OUT Orders.orderID%TYPE)
-AS
-BEGIN
-    
-    INSERT INTO Orders (customerID, storeID, orderDate)
-    VALUES (orderObj.customerID, orderObj.storeID, CURRENT_DATE)
-    RETURNING orderID INTO newOrderID;
-END;
-/
-
-/* addOrderItem(orderID -> from CreateOrder, prodID, quantity ): in jdbc, use a loop to call addOrderItem for every product they add to their order 
-this procedure will add a new order item into the database */
-CREATE OR REPLACE PROCEDURE addOrderItem(
-    newOrderID IN Orders_Products.orderID%TYPE,
-    newProductID IN Orders_Products.productID%TYPE,
-    newQuantity IN OUT Orders_Products.quantity%TYPE)
-AS
-    numTotalProducts NUMBER;
-BEGIN
-    FOR warehouse IN (SELECT * FROM Warehouses_Products WHERE productID = newProductID) LOOP
-        IF warehouse.quantity >= newQuantity THEN
-            UPDATE Warehouses_Products SET quantity = warehouse.quantity - newQuantity 
-            WHERE warehouseID = warehouse.warehouseID;
-            CONTINUE;
-        ELSIF warehouse.quantity < newQuantity THEN
-            newQuantity := newQuantity - warehouse.quantity;
-            UPDATE Warehouses_Products SET quantity = 0 
-            WHERE warehouseID = warehouse.warehouseID;
-        END IF;
-    END LOOP;
-    INSERT INTO Orders_Products
-    VALUES(newOrderID, newProductID, newQuantity);
-EXCEPTION
-    WHEN OTHERS THEN
-        dbms_output.put_line('Something went wrong, see block' || SQLERRM);
-        RAISE;
-END;
-/
-
-/* this procedure takes an old productID and will remove it from the database */
-CREATE OR REPLACE PROCEDURE removeProduct(oldProductID IN Products.productID%TYPE)
-AS
-BEGIN
-   DELETE FROM Products WHERE productID = oldProductID; 
-END;
-/
-
-/* this trigger logs any orders that have been added into the LogOrderModification table */
-CREATE TRIGGER  After_OrderModification_Insert
-AFTER INSERT
-ON Orders
-FOR EACH ROW
-BEGIN
-    INSERT INTO LogOrderModification 
-    VALUES(:NEW.orderID, :NEW.CustomerID, :NEW.StoreID, CURRENT_DATE, 'INSERT');
-END;
-/
-
-/* this trigger logs any reviews that have been added or deleted into the LogReviewModification table */
-CREATE OR REPLACE TRIGGER  Before_ReviewDelete_Delete
-BEFORE DELETE OR INSERT
-ON Reviews
-FOR EACH ROW
-BEGIN
-    IF DELETING THEN
-        INSERT INTO LogReviewModification 
-        VALUES(:OLD.reviewID, :OLD.ProductID, :OLD.CustomerID, :OLD.star, :OLD.flagNums, :OLD.description, CURRENT_DATE, 'DELETE');
-    ELSIF INSERTING THEN
-        INSERT INTO LogReviewModification 
-        VALUES(:NEW.reviewID, :NEW.ProductID, :NEW.CustomerID, :NEW.star, :NEW.flagNums, :NEW.description, CURRENT_DATE, 'INSERT');
-    END IF;
-END;
-/
-
-/******** VIEW PACKAGE BEGINS HERE *********/
-CREATE OR REPLACE PACKAGE viewPackage AS
-    TYPE cursor_table IS REF CURSOR; -- this type can be used for all your proceudes, no need to redeclare!
-    /** BIANCA **/
-    PROCEDURE viewCustomers(cursor_c IN OUT cursor_table);
+    TYPE cursor_table IS REF CURSOR;
     PROCEDURE viewReviews(cursor_c IN OUT cursor_table);
-    PROCEDURE viewWarehouses(cursor_c IN OUT cursor_table);
-    /** AMY **/
+    FUNCTION calculateAvgReviewScore(fproductID Reviews.productid%TYPE) 
+    RETURN NUMBER;
     PROCEDURE viewProducts (cursor_view IN OUT cursor_table);
-    PROCEDURE viewOrders (cursor_view IN OUT cursor_table);
-    PROCEDURE viewStores (cursor_view IN OUT cursor_table);
     PROCEDURE viewProductsbyCategory (cursor_view IN OUT cursor_table, categoryName VARCHAR2);
-    
-END viewPackage;
+    PROCEDURE viewStores (cursor_view IN OUT cursor_table);
+    PROCEDURE viewWarehouses(cursor_c IN OUT cursor_table);
+END viewReviewProdMenu;
 /
 
-CREATE OR REPLACE PACKAGE BODY viewPackage
+CREATE OR REPLACE PACKAGE BODY viewReviewProdMenu
 AS
-    /** BIANCA **/
-    PROCEDURE viewCustomers(cursor_c IN OUT cursor_table)
-    AS
-    BEGIN
-        OPEN cursor_c FOR
-            SELECT * FROM Customers;
-    END;
-    
-    PROCEDURE viewWarehouses(cursor_c IN OUT cursor_table)
-    AS
-    BEGIN
-        OPEN cursor_c FOR
-            SELECT * FROM Warehouses;
-    END;
-    
+    /* this function returns all the information for reviews 
+    in the form of a cursor*/
     PROCEDURE viewReviews(cursor_c IN OUT cursor_table)
     AS
     BEGIN
         OPEN cursor_c FOR
             SELECT * FROM Reviews;
     END;
-    /** AMY **/
     
-    PROCEDURE viewProducts (cursor_view IN OUT cursor_table)
-    AS
-    BEGIN
-        OPEN cursor_view FOR
-            SELECT * FROM Products;
-    END;
-    
-    PROCEDURE viewOrders (cursor_view IN OUT cursor_table)
-    AS 
-    BEGIN
-        OPEN cursor_view FOR
-            SELECT * FROM Orders;
-    END;
-    
-    PROCEDURE viewStores (cursor_view IN OUT cursor_table)
-    AS
-    BEGIN 
-        OPEN cursor_view FOR
-            SELECT * FROM Stores;
-    END;
-    
-    PROCEDURE viewProductsbyCategory (cursor_view IN OUT cursor_table, categoryName VARCHAR2)
-    AS
-    BEGIN
-        OPEN cursor_view FOR
-            SELECT * FROM Products WHERE category = categoryName;
-    END;
-END viewPackage;
-/
--- prodID, warehouseID, quantity update Warehouse_products
-CREATE OR REPLACE PROCEDURE newDeliveryIncome(
-newProductID IN Products.productID%TYPE,
-newWarehouseID IN Warehouses.warehouseID%TYPE,
-newQuantity IN Warehouses_Products.quantity%TYPE)
-AS
-    oldQuantity NUMBER;
-BEGIN
-    SELECT
-        quantity INTO oldQuantity
-    FROM
-        Warehouses_Products
-    WHERE
-        productID = newProductID
-        AND warehouseID = newWarehouseID;
-    oldQuantity := oldQuantity + newQuantity;
-    UPDATE Warehouses_Products SET quantity = oldQuantity 
-    WHERE productID = newProductID AND warehouseID = newWarehouseID;
-EXCEPTION
-    WHEN OTHERS THEN
-        dbms_output.put_line('something went wrong');
-END;
-/
-
-
-/****/
-
-
-/**AMY**/
-
-/**
-*counts how many orders has been placed on a specific product 
-*/
-CREATE OR REPLACE FUNCTION numOrders(fproductID Products.productid%TYPE) RETURN NUMBER 
-    AS
-        results NUMBER(3);
-    BEGIN 
-        SELECT COUNT(orderid) INTO results 
-            FROM Orders_products
-            WHERE productid = fproductID;
-    
-        RETURN results;
-    EXCEPTION
-        WHEN OTHERS THEN
-            dbms_output.put_line('something went wrong');
-            RAISE;
-    END;
-/
-/**
-*This function calculates the average score of a product.
-*returns the average
-*/
-CREATE OR REPLACE FUNCTION calculateAvgReviewScore(fproductID Reviews.productid%TYPE) RETURN NUMBER
+    /**
+    *This function calculates the average score of a product.
+    *returns the average
+    */
+    FUNCTION calculateAvgReviewScore(fproductID Reviews.productid%TYPE) RETURN NUMBER
     AS
         averageScore NUMBER(4,2);
     BEGIN
@@ -652,14 +487,194 @@ CREATE OR REPLACE FUNCTION calculateAvgReviewScore(fproductID Reviews.productid%
             dbms_output.put_line('something went wrong' || SQLERRM);
             RAISE;
     END;
-
+        
+    PROCEDURE viewProducts (cursor_view IN OUT cursor_table)
+    AS
+    BEGIN
+        OPEN cursor_view FOR
+            SELECT * FROM Products;
+    END;
+    
+    PROCEDURE viewProductsbyCategory (cursor_view IN OUT cursor_table, categoryName VARCHAR2)
+    AS
+    BEGIN
+        OPEN cursor_view FOR
+            SELECT * FROM Products WHERE category = categoryName;
+    END;
+    
+    PROCEDURE viewStores (cursor_view IN OUT cursor_table)
+    AS
+    BEGIN 
+        OPEN cursor_view FOR
+            SELECT * FROM Stores;
+    END;
+    
+    PROCEDURE viewWarehouses(cursor_c IN OUT cursor_table)
+    AS
+    BEGIN
+        OPEN cursor_c FOR
+            SELECT * FROM Warehouses;
+    END;
+    
+END viewReviewProdMenu;
 /
-/**
-*Takes the reviewID, adds  1  to the current flagNums 
-*Valdation: if flagNum >=2, delete row with that reviewID
-*
-**/
-CREATE OR REPLACE PROCEDURE flagReview(pReviewID Reviews.reviewid%TYPE) 
+
+CREATE OR REPLACE PACKAGE viewOrderMenu
+AS
+    FUNCTION totalInventory(productIDsearch Products.productID%TYPE)
+    RETURN NUMBER;
+    FUNCTION numOrders(fproductID Products.productid%TYPE) RETURN NUMBER;
+    TYPE cursor_table IS REF CURSOR; 
+    PROCEDURE viewOrders (cursor_view IN OUT cursor_table);
+END viewOrderMenu;
+/
+
+CREATE OR REPLACE PACKAGE BODY viewOrderMenu
+AS
+    /* this function taks a productid as input and will calculate the 
+    total inventory for that product across all tables */
+    FUNCTION totalInventory(productIDsearch Products.productID%TYPE)
+    RETURN NUMBER
+    AS
+        totalnum NUMBER(10);
+    BEGIN
+        SELECT
+            SUM(quantity) INTO totalNum
+        FROM
+            Warehouses_Products
+        WHERE
+            productId = productIDsearch;
+        RETURN(totalNum);
+    END;
+    
+    /**
+    *counts how many orders has been placed on a specific product 
+    */
+    FUNCTION numOrders(fproductID Products.productid%TYPE) RETURN NUMBER 
+    AS
+        results NUMBER(3);
+    BEGIN 
+        SELECT COUNT(orderid) INTO results 
+            FROM Orders_products
+            WHERE productid = fproductID;
+    
+        RETURN results;
+    EXCEPTION
+        WHEN OTHERS THEN
+            dbms_output.put_line('something went wrong');
+            RAISE;
+    END;
+    
+    PROCEDURE viewOrders (cursor_view IN OUT cursor_table)
+    AS 
+    BEGIN
+        OPEN cursor_view FOR
+            SELECT * FROM Orders;
+    END;
+
+END viewOrderMenu;
+/
+
+CREATE OR REPLACE PACKAGE dataManipulation
+AS
+    PROCEDURE createOrder(
+    orderObj IN order_type, 
+    newOrderID OUT Orders.orderID%TYPE);
+    PROCEDURE addOrderItem(
+    newOrderID IN Orders_Products.orderID%TYPE,
+    newProductID IN Orders_Products.productID%TYPE,
+    newQuantity IN OUT Orders_Products.quantity%TYPE);
+    PROCEDURE removeProduct(oldProductID IN Products.productID%TYPE);
+    PROCEDURE newDeliveryIncome(
+    newProductID IN Products.productID%TYPE,
+    newWarehouseID IN Warehouses.warehouseID%TYPE,
+    newQuantity IN Warehouses_Products.quantity%TYPE);
+    PROCEDURE flagReview(pReviewID Reviews.reviewid%TYPE);
+    PROCEDURE createReview(reviewObj IN review_type);
+    PROCEDURE addCustomer(customer IN customer_type);
+    PROCEDURE removeWarehouse(pWarehouseID Warehouses.warehouseid%TYPE);
+END dataManipulation;
+/
+
+CREATE OR REPLACE PACKAGE BODY dataManipulation
+AS
+    /* createOrder (orderID OUT, storeID, cusID): function that takes as input storeID and customerID */
+    PROCEDURE createOrder(
+    orderObj IN order_type, 
+    newOrderID OUT Orders.orderID%TYPE)
+    AS
+    BEGIN
+        
+        INSERT INTO Orders (customerID, storeID, orderDate)
+        VALUES (orderObj.customerID, orderObj.storeID, CURRENT_DATE)
+        RETURNING orderID INTO newOrderID;
+    END;
+    
+    /* addOrderItem(orderID -> from CreateOrder, prodID, quantity ): in jdbc, use a loop to call addOrderItem for every product they add to their order 
+    this procedure will add a new order item into the database */
+    PROCEDURE addOrderItem(
+        newOrderID IN Orders_Products.orderID%TYPE,
+        newProductID IN Orders_Products.productID%TYPE,
+        newQuantity IN OUT Orders_Products.quantity%TYPE)
+    AS
+        numTotalProducts NUMBER;
+    BEGIN
+        FOR warehouse IN (SELECT * FROM Warehouses_Products WHERE productID = newProductID) LOOP
+            IF warehouse.quantity >= newQuantity THEN
+                UPDATE Warehouses_Products SET quantity = warehouse.quantity - newQuantity 
+                WHERE warehouseID = warehouse.warehouseID;
+                CONTINUE;
+            ELSIF warehouse.quantity < newQuantity THEN
+                newQuantity := newQuantity - warehouse.quantity;
+                UPDATE Warehouses_Products SET quantity = 0 
+                WHERE warehouseID = warehouse.warehouseID;
+            END IF;
+        END LOOP;
+        INSERT INTO Orders_Products
+        VALUES(newOrderID, newProductID, newQuantity);
+    EXCEPTION
+        WHEN OTHERS THEN
+            dbms_output.put_line('Something went wrong, see block' || SQLERRM);
+            RAISE;
+    END;
+    
+    /* this procedure takes an old productID and will remove it from the database */
+    PROCEDURE removeProduct(oldProductID IN Products.productID%TYPE)
+    AS
+    BEGIN
+       DELETE FROM Products WHERE productID = oldProductID; 
+    END;
+    
+    /* this procedure will take all necessary info to update the stock in a warehouse,
+    simulating logging a new delivery to a warehouse */
+    PROCEDURE newDeliveryIncome(
+    newProductID IN Products.productID%TYPE,
+    newWarehouseID IN Warehouses.warehouseID%TYPE,
+    newQuantity IN Warehouses_Products.quantity%TYPE)
+    AS
+        oldQuantity NUMBER;
+    BEGIN
+        SELECT
+            quantity INTO oldQuantity
+        FROM
+            Warehouses_Products
+        WHERE
+            productID = newProductID
+            AND warehouseID = newWarehouseID;
+        oldQuantity := oldQuantity + newQuantity;
+        UPDATE Warehouses_Products SET quantity = oldQuantity 
+        WHERE productID = newProductID AND warehouseID = newWarehouseID;
+    EXCEPTION
+        WHEN OTHERS THEN
+            dbms_output.put_line('something went wrong');
+    END;
+
+    /**
+    *Takes the reviewID, adds  1  to the current flagNums 
+    *Valdation: if flagNum >=2, delete row with that reviewID
+    *
+    **/
+    PROCEDURE flagReview(pReviewID Reviews.reviewid%TYPE) 
     AS
         oldFlagNum NUMBER(2) := 0;
     BEGIN
@@ -682,208 +697,24 @@ CREATE OR REPLACE PROCEDURE flagReview(pReviewID Reviews.reviewid%TYPE)
         RAISE;
         
     END;
-/
-
-CREATE OR REPLACE TYPE review_type AS OBJECT(
-    productID       NUMBER(2),
-    customerID      NUMBER(2),
-    star            NUMBER(1),
-    flagnums        NUMBER(1),
-    description     VARCHAR2(100)
-);
-/
-/**
-*This procedure adds a review into the Reviews table
-*/
-CREATE OR REPLACE PROCEDURE createReview(reviewObj IN review_type)
-    AS
     
-    BEGIN
-        INSERT INTO Reviews (productid, customerid, star, flagnums, description)
-            VALUES (reviewObj.productID, reviewObj.customerID, reviewObj.star, 0, reviewObj.description);
-    
-    EXCEPTION 
-        WHEN OTHERS THEN 
-            dbms_output.put_line('something went wrong');
-            RAISE;
-END;
-
-/
-
- 
-/**
-*This procedure deletes a warehouse when taken in a warehouseid 
-*/
-CREATE OR REPLACE PROCEDURE removeWarehouse(pWarehouseID Warehouses.warehouseid%TYPE)
-    AS
-    
-    BEGIN
-        DELETE FROM Warehouses WHERE warehouseid = pWarehouseID;
+    /**
+    *This procedure adds a review into the Reviews table
+    */
+    PROCEDURE createReview(reviewObj IN review_type)
+        AS
         
-    EXCEPTION
-        WHEN OTHERS THEN
-            dbms_output.put_line('something went wrong');
-            RAISE;
+        BEGIN
+            INSERT INTO Reviews (productid, customerid, star, flagnums, description)
+                VALUES (reviewObj.productID, reviewObj.customerID, reviewObj.star, 0, reviewObj.description);
+        
+        EXCEPTION 
+            WHEN OTHERS THEN 
+                dbms_output.put_line('something went wrong');
+                RAISE;
     END;
-/
-/**
-*This procedure logs the user login with their username and the data that they logged in at
-*/
-CREATE OR REPLACE PROCEDURE logUserLogin(username Loglogins.username%TYPE)
-    AS
     
-    BEGIN
-        INSERT INTO LogLogins
-            VALUES (username, CURRENT_DATE);
-    EXCEPTION
-        WHEN OTHERS THEN
-            dbms_output.put_line('something went wrong');
-            RAISE;
-    END;
-/
-
---this trigger logs in when a stock is added or deducted.
-CREATE OR REPLACE TRIGGER beforeModifyingWarehouse
-BEFORE DELETE OR INSERT
-ON Warehouses_products
-FOR EACH ROW
-BEGIN
-    IF DELETING THEN
-        INSERT INTO Logwarehousemodification
-            VALUES (:OLD.warehouseid, :OLD.productid, :OLD.quantity, CURRENT_DATE, 'DELETED');
-    ELSIF INSERTING THEN
-        INSERT INTO Logwarehousemodification
-            VALUES(:NEW.warehouseid, :NEW.productid, :NEW.quantity, CURRENT_DATE, 'INSERTED');
-    END IF;
-END;
-/
-/****/
-
-/** getting table IDs **/
-
-
-/** this function will return a list containing all valid product IDs **/
-CREATE OR REPLACE FUNCTION getProductIDs (fProductID Products.productid%TYPE)RETURN NUMBER
-    AS
-        idCounts    NUMBER(2) := 0;
-    BEGIN
-        SELECT COUNT(productid) INTO idCounts 
-            FROM Products
-            WHERE productid = fProductID;
-        
-        IF (idCounts > 0) THEN 
-            RETURN 1;
-        ELSE 
-            RETURN 0;
-        END IF;
-        
-    EXCEPTION
-        WHEN OTHERS THEN 
-            dbms_output.put_line('something went wrong');
-            RAISE;
-END;
-/
-
-/** this function will return a list containing all valid customer IDs **/
-CREATE OR REPLACE FUNCTION getCustomerIDs (fCustomerID Customers.customerid%TYPE) RETURN NUMBER
-AS
-    idCounts    NUMBER(2) := 0;
-BEGIN
-    SELECT COUNT(customerid) INTO idCounts
-        FROM Customers
-        WHERE customerid = fCustomerID;
-
-        IF (idCounts > 0) THEN 
-            RETURN 1;
-        ELSE 
-            RETURN 0;
-        END IF;
-        
-    EXCEPTION
-        WHEN OTHERS THEN 
-            dbms_output.put_line('something went wrong');
-            RAISE;
-END;
-
-/
-
-CREATE OR REPLACE FUNCTION getWarehouseIDs (fWarehouseID Warehouses.warehouseid%TYPE) RETURN NUMBER
-AS
-    idCounts    NUMBER(2) := 0;
-BEGIN
-    SELECT COUNT(warehouseid) INTO idCounts
-        FROM Warehouses
-        WHERE warehouseid = fWarehouseID;
-
-        IF (idCounts > 0) THEN 
-            RETURN 1;
-        ELSE 
-            RETURN 0;
-        END IF;
-        
-    EXCEPTION
-        WHEN OTHERS THEN 
-            dbms_output.put_line('something went wrong');
-            RAISE;
-END;
-
-/
-
-CREATE OR REPLACE FUNCTION getStoreIDs (fStoreID Stores.storeid%TYPE) RETURN NUMBER
-AS
-    idCounts    NUMBER(2) := 0;
-BEGIN
-    SELECT COUNT(storeid) INTO idCounts
-        FROM Stores
-        WHERE storeid = fStoreID;
-
-        IF (idCounts > 0) THEN 
-            RETURN 1;
-        ELSE 
-            RETURN 0;
-        END IF;
-        
-    EXCEPTION
-        WHEN OTHERS THEN 
-            dbms_output.put_line('something went wrong');
-            RAISE;
-END;
-
-/
-
-CREATE OR REPLACE FUNCTION getReviewIDs (fReviewID Reviews.reviewid%TYPE) RETURN NUMBER
-AS
-    idCounts    NUMBER(2) := 0;
-BEGIN
-    SELECT COUNT(reviewid) INTO idCounts
-        FROM Reviews
-        WHERE reviewid = fReviewID;
-
-        IF (idCounts > 0) THEN 
-            RETURN 1;
-        ELSE 
-            RETURN 0;
-        END IF;
-        
-    EXCEPTION
-        WHEN OTHERS THEN 
-            dbms_output.put_line('something went wrong');
-            RAISE;
-END;
-
-/
-CREATE OR REPLACE TYPE customer_type AS OBJECT(
-    firstname   VARCHAR2(40),
-    lastname    VARCHAR2(20),
-    email       VARCHAR2(30),
-    streetAddress   VARCHAR2(40),
-    city            VARCHAR2(40),
-    province        VARCHAR2(40),
-    country         VARCHAR2(40)
-    );
-/
-
-CREATE OR REPLACE PROCEDURE addCustomer(customer IN customer_type)
+    PROCEDURE addCustomer(customer IN customer_type)
     AS  
         customerExists NUMBER(2) :=0;
         e_customer_exists EXCEPTION;
@@ -903,8 +734,220 @@ CREATE OR REPLACE PROCEDURE addCustomer(customer IN customer_type)
             dbms_output.put_line('something went wrong');
             RAISE;
     END;
-
+    
+     
+    /**
+    *This procedure deletes a warehouse when taken in a warehouseid 
+    */
+    PROCEDURE removeWarehouse(pWarehouseID Warehouses.warehouseid%TYPE)
+    AS
+    
+    BEGIN
+        DELETE FROM Warehouses WHERE warehouseid = pWarehouseID;
+        
+    EXCEPTION
+        WHEN OTHERS THEN
+            dbms_output.put_line('something went wrong');
+            RAISE;
+    END;
+    
+END dataManipulation;
 /
 
 
+/** getting table IDs **/
 
+CREATE OR REPLACE PACKAGE validatingIDs 
+AS
+    FUNCTION getProductIDs (fProductID Products.productid%TYPE)RETURN NUMBER;
+    FUNCTION getCustomerIDs (fCustomerID Customers.customerid%TYPE) RETURN NUMBER;
+    FUNCTION getWarehouseIDs (fWarehouseID Warehouses.warehouseid%TYPE) RETURN NUMBER;
+    FUNCTION getStoreIDs (fStoreID Stores.storeid%TYPE) RETURN NUMBER;
+    FUNCTION getReviewIDs (fReviewID Reviews.reviewid%TYPE) RETURN NUMBER;
+
+END validatingIDs;
+/
+CREATE OR REPLACE PACKAGE BODY validatingIDs
+AS
+    /** this function will return a list containing all valid product IDs **/
+    FUNCTION getProductIDs (fProductID Products.productid%TYPE)RETURN NUMBER
+        AS
+            idCounts    NUMBER(2) := 0;
+        BEGIN
+            SELECT COUNT(productid) INTO idCounts 
+                FROM Products
+                WHERE productid = fProductID;
+            
+            IF (idCounts > 0) THEN 
+                RETURN 1;
+            ELSE 
+                RETURN 0;
+            END IF;
+            
+        EXCEPTION
+            WHEN OTHERS THEN 
+                dbms_output.put_line('something went wrong');
+                RAISE;
+    END;
+
+    /** this function will return a list containing all valid customer IDs **/
+    FUNCTION getCustomerIDs (fCustomerID Customers.customerid%TYPE) RETURN NUMBER
+    AS
+        idCounts    NUMBER(2) := 0;
+    BEGIN
+        SELECT COUNT(customerid) INTO idCounts
+            FROM Customers
+            WHERE customerid = fCustomerID;
+    
+            IF (idCounts > 0) THEN 
+                RETURN 1;
+            ELSE 
+                RETURN 0;
+            END IF;
+            
+        EXCEPTION
+            WHEN OTHERS THEN 
+                dbms_output.put_line('something went wrong');
+                RAISE;
+    END;
+
+    
+    FUNCTION getWarehouseIDs (fWarehouseID Warehouses.warehouseid%TYPE) RETURN NUMBER
+    AS
+        idCounts    NUMBER(2) := 0;
+    BEGIN
+        SELECT COUNT(warehouseid) INTO idCounts
+            FROM Warehouses
+            WHERE warehouseid = fWarehouseID;
+    
+            IF (idCounts > 0) THEN 
+                RETURN 1;
+            ELSE 
+                RETURN 0;
+            END IF;
+            
+        EXCEPTION
+            WHEN OTHERS THEN 
+                dbms_output.put_line('something went wrong');
+                RAISE;
+    END;
+
+
+    FUNCTION getStoreIDs (fStoreID Stores.storeid%TYPE) RETURN NUMBER
+    AS
+        idCounts    NUMBER(2) := 0;
+    BEGIN
+        SELECT COUNT(storeid) INTO idCounts
+            FROM Stores
+            WHERE storeid = fStoreID;
+    
+            IF (idCounts > 0) THEN 
+                RETURN 1;
+            ELSE 
+                RETURN 0;
+            END IF;
+            
+        EXCEPTION
+            WHEN OTHERS THEN 
+                dbms_output.put_line('something went wrong');
+                RAISE;
+    END;
+
+    FUNCTION getReviewIDs (fReviewID Reviews.reviewid%TYPE) RETURN NUMBER
+    AS
+        idCounts    NUMBER(2) := 0;
+    BEGIN
+        SELECT COUNT(reviewid) INTO idCounts
+            FROM Reviews
+            WHERE reviewid = fReviewID;
+    
+            IF (idCounts > 0) THEN 
+                RETURN 1;
+            ELSE 
+                RETURN 0;
+            END IF;
+            
+        EXCEPTION
+            WHEN OTHERS THEN 
+                dbms_output.put_line('something went wrong');
+                RAISE;
+    END;
+
+END validatingIDs;
+/
+/**
+*This procedure logs the user login with their username and the data that they logged in at
+*/
+CREATE OR REPLACE PROCEDURE logUserLogin(username Loglogins.username%TYPE)
+    AS
+    
+    BEGIN
+        INSERT INTO LogLogins
+            VALUES (username, CURRENT_DATE);
+    EXCEPTION
+        WHEN OTHERS THEN
+            dbms_output.put_line('something went wrong');
+            RAISE;
+    END;
+/
+
+CREATE OR REPLACE PROCEDURE checkIfOrderStillValid(newOrderID IN Orders.orderID%TYPE)
+AS
+    numOrders NUMBER(2);
+BEGIN
+    SELECT
+        COUNT(*) INTO numOrders
+    FROM
+        Orders_Products
+    WHERE
+        orderID = newOrderID;
+    IF numOrders IS NULL OR numOrders = 0 THEN
+        DELETE FROM Orders WHERE orderID = newOrderID;
+    END IF;
+END;
+/
+
+/* TRIGGERS */
+
+/* this trigger logs any orders that have been added into the LogOrderModification table */
+CREATE TRIGGER  After_OrderModification_Insert
+AFTER INSERT
+ON Orders
+FOR EACH ROW
+BEGIN
+    INSERT INTO LogOrderModification 
+    VALUES(:NEW.orderID, :NEW.CustomerID, :NEW.StoreID, CURRENT_DATE, 'INSERT');
+END;
+/
+
+/* this trigger logs any reviews that have been added or deleted into the LogReviewModification table */
+CREATE OR REPLACE TRIGGER  Before_Review_DeleteInsert
+BEFORE DELETE OR INSERT
+ON Reviews
+FOR EACH ROW
+BEGIN
+    IF DELETING THEN
+        INSERT INTO LogReviewModification 
+        VALUES(:OLD.reviewID, :OLD.ProductID, :OLD.CustomerID, :OLD.star, :OLD.flagNums, :OLD.description, CURRENT_DATE, 'DELETE');
+    ELSIF INSERTING THEN
+        INSERT INTO LogReviewModification 
+        VALUES(:NEW.reviewID, :NEW.ProductID, :NEW.CustomerID, :NEW.star, :NEW.flagNums, :NEW.description, CURRENT_DATE, 'INSERT');
+    END IF;
+END;
+/
+
+--this trigger logs in when a stock is added or deducted.
+CREATE OR REPLACE TRIGGER beforeModifyingWarehouse
+BEFORE DELETE OR INSERT
+ON Warehouses_products
+FOR EACH ROW
+BEGIN
+    IF DELETING THEN
+        INSERT INTO Logwarehousemodification
+            VALUES (:OLD.warehouseid, :OLD.productid, :OLD.quantity, CURRENT_DATE, 'DELETED');
+    ELSIF INSERTING THEN
+        INSERT INTO Logwarehousemodification
+            VALUES(:NEW.warehouseid, :NEW.productid, :NEW.quantity, CURRENT_DATE, 'INSERTED');
+    END IF;
+END;
+/

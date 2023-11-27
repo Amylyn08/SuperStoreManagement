@@ -56,7 +56,7 @@ public class SuperstoreServices {
      * @throws SQLException
      */
     public void isProductIDValid(int productID) throws SQLException {
-        String sql = "{ ? = call getProductIDs(?)}";
+        String sql = "{ ? = call validatingIDs.getProductIDs(?)}";
         CallableStatement stmt = conn.prepareCall(sql);
         stmt.registerOutParameter(1, Types.INTEGER);
         stmt.setInt(2, productID);
@@ -77,7 +77,7 @@ public class SuperstoreServices {
      * @throws SQLException
      */
     public void isCustomerIDValid(int customerID) throws SQLException {
-        String sql = "{ ? = call getCustomerIDs(?)}";
+        String sql = "{ ? = call validatingIDs.getCustomerIDs(?)}";
         CallableStatement stmt = conn.prepareCall(sql);
         stmt.registerOutParameter(1, Types.INTEGER);
         stmt.setInt(2, customerID);
@@ -98,7 +98,7 @@ public class SuperstoreServices {
      * @throws SQLException
      */
     public void isWarehouseIDValid(int warehouseID) throws SQLException {
-        String sql = "{ ? = call getWarehouseIDs(?)}";
+        String sql = "{ ? = call validatingIDs.getWarehouseIDs(?)}";
         CallableStatement stmt = conn.prepareCall(sql);
         stmt.registerOutParameter(1, Types.INTEGER);
         stmt.setInt(2, warehouseID);
@@ -119,7 +119,7 @@ public class SuperstoreServices {
      * @throws SQLException
      */
     public void isStoreIDValid(int storeID) throws SQLException {
-        String sql = "{ ? = call getStoreIDs(?)}";
+        String sql = "{ ? = call validatingIDs.getStoreIDs(?)}";
         CallableStatement stmt = conn.prepareCall(sql);
         stmt.registerOutParameter(1, Types.INTEGER);
         stmt.setInt(2, storeID);
@@ -139,7 +139,7 @@ public class SuperstoreServices {
      * @throws SQLException - if id entered by user does not exist
      */
     public void isReviewIDValid(int reviewID) throws SQLException {
-        String sql = "{ ? = call getReviewIDs(?)}";
+        String sql = "{ ? = call validatingIDs.getReviewIDs(?)}";
         CallableStatement stmt = conn.prepareCall(sql);
         stmt.registerOutParameter(1, Types.INTEGER);
         stmt.setInt(2, reviewID);
@@ -162,7 +162,7 @@ public class SuperstoreServices {
      */
 
     public List<Customer> viewCustomers() throws SQLException {
-        CallableStatement cs = this.conn.prepareCall("{call viewPackage.viewCustomers(?)}");
+        CallableStatement cs = this.conn.prepareCall("{call viewCustomerMenu.viewCustomers(?)}");
         cs.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
         cs.execute();
         ResultSet rs = (ResultSet) cs.getObject(1);
@@ -191,7 +191,7 @@ public class SuperstoreServices {
      * @throws SQLException
      */
     public List<Review> viewReviews() throws SQLException {
-        CallableStatement cs = this.conn.prepareCall("{call viewPackage.viewReviews(?)}");
+        CallableStatement cs = this.conn.prepareCall("{call viewReviewProdMenu.viewReviews(?)}");
         cs.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
         cs.execute();
         ResultSet rs = (ResultSet) cs.getObject(1);
@@ -218,7 +218,7 @@ public class SuperstoreServices {
      * @throws SQLException
      */
     public List<Warehouse> viewWarehouse() throws SQLException {
-        CallableStatement cs = this.conn.prepareCall("{call viewPackage.viewWarehouses(?)}");
+        CallableStatement cs = this.conn.prepareCall("{call viewReviewProdMenu.viewWarehouses(?)}");
         cs.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
         cs.execute();
         ResultSet rs = (ResultSet) cs.getObject(1);
@@ -245,7 +245,7 @@ public class SuperstoreServices {
      * @throws SQLException
      */
     public int createOrder(Order orderObj) throws SQLException {
-        String orderProc = "{call createOrder(?, ?)}";
+        String orderProc = "{call dataManipulation.createOrder(?, ?)}";
         CallableStatement stmt = conn.prepareCall(orderProc);
         stmt.setObject(1, orderObj);
         stmt.registerOutParameter(2, Types.INTEGER);
@@ -270,7 +270,7 @@ public class SuperstoreServices {
         if (totalInventory(productID) < quantity) {
             throw new IllegalArgumentException("product does not have enough stock");
         }
-        String addItem = "{call addOrderItem(?, ?, ?)}";
+        String addItem = "{call dataManipulation.addOrderItem(?, ?, ?)}";
         CallableStatement stmt = conn.prepareCall(addItem);
         stmt.setInt(1, newOrderId);
         stmt.setInt(2, productID);
@@ -295,7 +295,7 @@ public class SuperstoreServices {
         if (quantity < 0) {
             throw new IllegalArgumentException("Quantities cannot be negative");
         }
-        String addDelivery = "{call newDeliveryIncome(?, ?, ?)}";
+        String addDelivery = "{call dataManipulation.newDeliveryIncome(?, ?, ?)}";
         CallableStatement stmt = conn.prepareCall(addDelivery);
         stmt.setInt(1, productID);
         stmt.setInt(2, warehouseID);
@@ -312,7 +312,7 @@ public class SuperstoreServices {
      */
     public int totalInventory(int productID) throws SQLException {
         isProductIDValid(productID);
-        String inventoryProc = "{? = call totalInventory(?)}";
+        String inventoryProc = "{? = call viewOrderMenu.totalInventory(?)}";
         CallableStatement stmt = conn.prepareCall(inventoryProc);
         stmt.registerOutParameter(1, Types.INTEGER);
         stmt.setInt(2, productID);
@@ -330,13 +330,12 @@ public class SuperstoreServices {
      */
     public List<String> flaggedCustomers() throws SQLException {
         List<String> customers = new ArrayList<String>();
-        String flaggedCusProc = "{ ? = call calculations.flaggedCustomers()}";
+        String flaggedCusProc = "{ ? = call viewCustomerMenu.flaggedCustomers()}";
         CallableStatement stmt = conn.prepareCall(flaggedCusProc);
-        stmt.registerOutParameter(1, Types.ARRAY, "CALCULATIONS.CUS_NAMES");
+        stmt.registerOutParameter(1, Types.ARRAY, "VIEWCUSTOMERMENU.CUS_NAMES");
         stmt.execute();
         Array cusNames = stmt.getArray(1);
         String[] resultArray = (String[]) cusNames.getArray();
-        List<Integer> results = new ArrayList<Integer>();
         for (String name : resultArray) {
             customers.add(name);
         }
@@ -351,7 +350,7 @@ public class SuperstoreServices {
      */
     public void removeProduct(int productID) throws SQLException {
         isProductIDValid(productID);
-        String removeProd = "{call removeProduct(?)}";
+        String removeProd = "{call dataManipulation.removeProduct(?)}";
         CallableStatement stmt = conn.prepareCall(removeProd);
         stmt.setInt(1, productID);
         stmt.execute();
@@ -368,7 +367,7 @@ public class SuperstoreServices {
      * @throws ClassNotFoundException
      */
     public void createReview(Review review) throws SQLException {
-        String createReview = "{call createReview(?)}";
+        String createReview = "{call dataManipulation.createReview(?)}";
         CallableStatement stmt = conn.prepareCall(createReview);
         stmt.setObject(1, review);
         stmt.execute();
@@ -382,7 +381,7 @@ public class SuperstoreServices {
      */
     public void flagReview(int reviewID) throws SQLException {
         isReviewIDValid(reviewID);
-        String flagReview = "{call flagReview(?)}";
+        String flagReview = "{call dataManipulation.flagReview(?)}";
         CallableStatement stmt = conn.prepareCall(flagReview);
         stmt.setInt(1, reviewID);
         stmt.execute();
@@ -397,7 +396,7 @@ public class SuperstoreServices {
      */
     public double calculateAvgReviewScore(int productID) throws SQLException {
         isProductIDValid(productID);
-        String gettingAvg = "{? = call calculateAvgReviewScore(?)}";
+        String gettingAvg = "{? = call viewReviewProdMenu.calculateAvgReviewScore(?)}";
         CallableStatement stmt = conn.prepareCall(gettingAvg);
         stmt.registerOutParameter(1, Types.INTEGER);
         stmt.setInt(2, productID);
@@ -416,7 +415,7 @@ public class SuperstoreServices {
      */
     public int numOrders(int productID) throws SQLException {
         isProductIDValid(productID);
-        String sql = "{? = call numOrders(?)}";
+        String sql = "{? = call viewOrderMenu.numOrders(?)}";
         CallableStatement stmt = conn.prepareCall(sql);
         stmt.registerOutParameter(1, Types.INTEGER);
         stmt.setInt(2, productID);
@@ -433,7 +432,7 @@ public class SuperstoreServices {
      */
     public void removeWarehouse(int warehouseID) throws SQLException {
         isWarehouseIDValid(warehouseID);
-        String sql = "{call removeWarehouse(?)}";
+        String sql = "{call dataManipulation.removeWarehouse(?)}";
         CallableStatement stmt = conn.prepareCall(sql);
         stmt.setInt(1, warehouseID);
         stmt.execute();
@@ -446,7 +445,7 @@ public class SuperstoreServices {
      * @throws SQLException
      */
     public void addCustomer(Customer cus) throws SQLException {
-        String createReview = "{call addCustomer(?)}";
+        String createReview = "{call dataManipulation.addCustomer(?)}";
         CallableStatement stmt = conn.prepareCall(createReview);
         stmt.setObject(1, cus);
         stmt.execute();
@@ -460,7 +459,7 @@ public class SuperstoreServices {
      * @throws ClassNotFoundException
      */
     public List<Order> viewAllOrders() throws SQLException, ClassNotFoundException {
-        CallableStatement stmt = conn.prepareCall("{call viewPackage.viewOrders(?)}");
+        CallableStatement stmt = conn.prepareCall("{call viewOrderMenu.viewOrders(?)}");
         stmt.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
         stmt.execute();
         ResultSet rs = (ResultSet) stmt.getObject(1);
@@ -484,7 +483,7 @@ public class SuperstoreServices {
      * @throws ClassNotFoundException
      */
     public List<Product> getAllProducts() throws SQLException, ClassNotFoundException {
-        CallableStatement stmt = conn.prepareCall("{call viewPackage.viewProducts(?)}");
+        CallableStatement stmt = conn.prepareCall("{call viewReviewProdMenu.viewProducts(?)}");
         stmt.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
         stmt.execute();
         ResultSet rs = (ResultSet) stmt.getObject(1);
@@ -506,7 +505,7 @@ public class SuperstoreServices {
      * @throws ClassNotFoundException
      */
     public List<Store> getAllStores() throws SQLException, ClassNotFoundException {
-        CallableStatement stmt = conn.prepareCall("{call viewPackage.viewStores(?) }");
+        CallableStatement stmt = conn.prepareCall("{call viewReviewProdMenu.viewStores(?) }");
         stmt.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
         stmt.execute();
         ResultSet rs = (ResultSet) stmt.getObject(1);
@@ -529,7 +528,7 @@ public class SuperstoreServices {
      * @throws ClassNotFoundException
      */
     public List<Product> getProductsByCategory(String categoryName) throws SQLException, ClassNotFoundException {
-        CallableStatement stmt = conn.prepareCall("{call viewPackage.viewProductsByCategory(?,?)}");
+        CallableStatement stmt = conn.prepareCall("{call viewReviewProdMenu.viewProductsByCategory(?,?)}");
         stmt.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
         stmt.setString(2, categoryName);
         stmt.execute();
